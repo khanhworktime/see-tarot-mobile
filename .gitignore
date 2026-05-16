@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+
+# Xcode / SPM (when ios/ implementation starts)
+ios/**/.build/
+ios/**/DerivedData/
+ios/**/*.xcuserstate
+xcuserdata/
+
+# Secrets
+*.env
+.env.local
