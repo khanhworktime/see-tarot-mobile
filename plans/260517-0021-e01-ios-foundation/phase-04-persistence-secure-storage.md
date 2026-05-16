@@ -4,9 +4,15 @@ Context: `plan.md`, story `design.md` (Data Model), `docs/product/readings.md`.
 
 ## Overview
 
-Priority: P1. Status: pending.
+Priority: P1. Status: done (2026-05-17).
 `SeeTarotPersistence`: Keychain token store (the `TokenStoring` impl),
 SwiftData container (placeholder cache entity), artwork disk cache.
+
+Evidence: `swift test` SeeTarotPersistence → 4/4 passed (token store
+round-trip via fake keychain incl. empty/nil clear; in-memory SwiftData
+insert/fetch; artwork cache miss→store→hit). App BUILD SUCCEEDED. Notes:
+`FileProtectionType` guarded `#if os(iOS)`; Persistence+Features bumped to
+`.macOS(.v14)` for SwiftData on host test.
 
 ## Key Insights
 

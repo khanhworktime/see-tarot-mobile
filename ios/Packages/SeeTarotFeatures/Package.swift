@@ -4,7 +4,7 @@ import PackageDescription
 // SeeTarotFeatures: feature modules (Auth, App shell) composing all layers.
 let package = Package(
     name: "SeeTarotFeatures",
-    platforms: [.iOS(.v17), .macOS(.v13)],
+    platforms: [.iOS(.v17), .macOS(.v14)],
     products: [.library(name: "SeeTarotFeatures", targets: ["SeeTarotFeatures"])],
     dependencies: [
         .package(path: "../SeeTarotCore"),
