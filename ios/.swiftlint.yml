@@ -1,6 +1,8 @@
 # Lenient per development-rules.md: no syntax/compile errors, not strict style.
 excluded:
   - ".build"
+  - "Packages/**/.build"
+  - ".xcdd"
   - "DerivedData"
 disabled_rules:
   - trailing_whitespace

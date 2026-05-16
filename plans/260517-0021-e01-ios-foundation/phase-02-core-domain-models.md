@@ -4,9 +4,13 @@ Context: `plan.md`, BE doc §5, `docs/product/{api-conventions,readings}.md`.
 
 ## Overview
 
-Priority: P0. Status: pending.
+Priority: P0. Status: done (2026-05-17).
 Pure `Codable` domain types in `SeeTarotCore` mirroring the BE contract.
 No UI, no networking. Fully unit-tested.
+
+Evidence: `swift test` SeeTarotCore → 14/14 passed (quota null⇒unlimited,
+envelope ±issues, onboarding, ReadingInput round-trip + client validation,
+Reading w/ cards, SSE Done). Project still BUILD SUCCEEDED; lint exit 0.
 
 ## Key Insights
 

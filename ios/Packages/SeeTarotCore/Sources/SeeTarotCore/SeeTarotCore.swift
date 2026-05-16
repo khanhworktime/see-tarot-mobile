@@ -1,7 +1,7 @@
-// SeeTarotCore — domain models + coding. Filled in Phase 02.
 import Foundation
 
-/// Marker for the Core module; real models arrive in Phase 02.
+/// SeeTarotCore namespace. Domain models live in `Models/`, coders in
+/// `Coding/`. No internal dependencies (decision 0004).
 public enum SeeTarotCore {
     public static let moduleName = "SeeTarotCore"
 }
