@@ -35,7 +35,7 @@ so E02–E05 build in parallel without rework. Scope = E01 only.
 
 | # | Phase | Status | Output |
 |---|-------|--------|--------|
-| 01 | [Workspace & SPM bootstrap](phase-01-workspace-spm-bootstrap.md) | pending | Buildable empty app + package graph |
+| 01 | [Workspace & SPM bootstrap](phase-01-workspace-spm-bootstrap.md) | done | Buildable empty app + package graph |
 | 02 | [Core domain models](phase-02-core-domain-models.md) | pending | Codable types + envelope/SSE types + tests |
 | 03 | [Networking core](phase-03-networking-core.md) | pending | APIClient protocol/real/stub, SSE seam |
 | 04 | [Persistence & secure storage](phase-04-persistence-secure-storage.md) | pending | Keychain, SwiftData, artwork cache |

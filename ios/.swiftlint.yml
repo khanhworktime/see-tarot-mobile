@@ -1,0 +1,13 @@
+# Lenient per development-rules.md: no syntax/compile errors, not strict style.
+excluded:
+  - ".build"
+  - "DerivedData"
+disabled_rules:
+  - trailing_whitespace
+  - todo
+line_length:
+  warning: 140
+  error: 220
+file_length:
+  warning: 200
+  error: 400

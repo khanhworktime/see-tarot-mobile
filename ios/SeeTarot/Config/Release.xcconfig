@@ -1,0 +1,2 @@
+// Release build configuration. No secrets here.
+API_BASE_URL = https:/$()/api.seetarot.com

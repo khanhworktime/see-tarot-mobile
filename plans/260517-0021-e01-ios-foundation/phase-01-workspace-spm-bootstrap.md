@@ -4,7 +4,13 @@ Context: `plan.md`, `docs/decisions/0004-*`, story `design.md`.
 
 ## Overview
 
-Priority: P0 (blocks all). Status: pending.
+Priority: P0 (blocks all). Status: done (2026-05-17).
+
+Evidence: `xcodebuild ... build` → BUILD SUCCEEDED (all 6 packages compiled);
+app installed + launched on iOS simulator (process running); SwiftLint exit 0.
+Note: project generated via `xcodegen` (project.yml) — `.xcodeproj` gitignored.
+Metal shader deferred to Phase 06 (missing Metal toolchain component;
+`xcodebuild -downloadComponent MetalToolchain` required there).
 Create the `ios/` Xcode project + local Swift Package graph. Empty app builds
 and runs on an iOS 17 simulator. No features yet.
 

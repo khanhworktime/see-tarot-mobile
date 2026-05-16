@@ -4,6 +4,8 @@
 # Xcode / SPM (when ios/ implementation starts)
 ios/**/.build/
 ios/**/DerivedData/
+ios/.xcdd/
+ios/SeeTarot.xcodeproj/
 ios/**/*.xcuserstate
 xcuserdata/
 

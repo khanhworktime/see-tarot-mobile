@@ -26,6 +26,11 @@ with a Metal ambient-background spike. No real card animation (E02).
   `MTKView`) rendering a cheap shader (gradient/particles), plus a
   `CardSurface` protocol/placeholder seam for E02.
 - A measurable 60fps check for the ambient view (instrumented or manual note).
+- Prereq: install Metal toolchain component first —
+  `xcodebuild -downloadComponent MetalToolchain` (not present in env; Phase 01
+  deferred the shader because of this). Reintroduce `resources:
+  [.process("Shaders")]` in `SeeTarotCardEngine/Package.swift` + the `.metal`
+  file when implementing.
 
 ## Architecture
 
