@@ -37,7 +37,7 @@ so E02–E05 build in parallel without rework. Scope = E01 only.
 |---|-------|--------|--------|
 | 01 | [Workspace & SPM bootstrap](phase-01-workspace-spm-bootstrap.md) | done | Buildable empty app + package graph |
 | 02 | [Core domain models](phase-02-core-domain-models.md) | done | Codable types + envelope/SSE types + tests |
-| 03 | [Networking core](phase-03-networking-core.md) | pending | APIClient protocol/real/stub, SSE seam |
+| 03 | [Networking core](phase-03-networking-core.md) | done | APIClient protocol/real/stub, SSE seam |
 | 04 | [Persistence & secure storage](phase-04-persistence-secure-storage.md) | pending | Keychain, SwiftData, artwork cache |
 | 05 | [Auth + session bootstrap](phase-05-auth-session-bootstrap.md) | pending | Email sign-in E2E, onboarding gate seam |
 | 06 | [DesignSystem & CardEngine seams](phase-06-designsystem-cardengine-seams.md) | pending | Tokens + Metal ambient spike |

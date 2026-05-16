@@ -4,7 +4,7 @@ import PackageDescription
 // SeeTarotPersistence: Keychain token store, SwiftData container, artwork cache.
 let package = Package(
     name: "SeeTarotPersistence",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v13)],
     products: [.library(name: "SeeTarotPersistence", targets: ["SeeTarotPersistence"])],
     dependencies: [
         .package(path: "../SeeTarotCore"),

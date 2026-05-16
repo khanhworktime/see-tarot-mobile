@@ -4,7 +4,7 @@ import PackageDescription
 // SeeTarotNetworking: API client protocol, live/stub clients, SSE primitive.
 let package = Package(
     name: "SeeTarotNetworking",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v13)],
     products: [.library(name: "SeeTarotNetworking", targets: ["SeeTarotNetworking"])],
     dependencies: [.package(path: "../SeeTarotCore")],
     targets: [

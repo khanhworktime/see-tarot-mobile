@@ -4,7 +4,7 @@ import PackageDescription
 // SeeTarotCore: pure domain models + coding. No internal dependencies.
 let package = Package(
     name: "SeeTarotCore",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v13)],
     products: [
         .library(name: "SeeTarotCore", targets: ["SeeTarotCore"])
     ],

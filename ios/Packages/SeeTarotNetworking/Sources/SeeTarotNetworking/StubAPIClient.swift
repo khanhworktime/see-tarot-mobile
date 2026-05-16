@@ -1,0 +1,57 @@
+import Foundation
+import SeeTarotCore
+
+/// Deterministic in-memory client for unit tests and SwiftUI previews.
+/// Behaviour is fully configurable via the closures.
+public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
+    public var providers = AuthProviders(google: false)
+    public var sessionUser: SessionUser?
+    public var authError: Error?
+    public var sseScript: [SSEEvent] = []
+    public private(set) var signedOut = false
+
+    public init(sessionUser: SessionUser? = nil) {
+        self.sessionUser = sessionUser
+    }
+
+    public func authProviders() async throws -> AuthProviders { providers }
+
+    public func signUpEmail(name: String, email: String,
+                            password: String) async throws -> SessionUser {
+        try await authed()
+    }
+
+    public func signInEmail(email: String,
+                            password: String) async throws -> SessionUser {
+        try await authed()
+    }
+
+    private func authed() async throws -> SessionUser {
+        if let authError { throw authError }
+        guard let user = sessionUser else { throw APIError.badResponse }
+        return user
+    }
+
+    public func getSession() async throws -> SessionUser? { sessionUser }
+
+    public func signOut() async throws {
+        signedOut = true
+        sessionUser = nil
+    }
+
+    public func send<T: Decodable & Sendable>(_ endpoint: Endpoint,
+                                              as type: T.Type) async throws -> T {
+        throw APIError.transport("StubAPIClient.send unconfigured for \(endpoint.path)")
+    }
+
+    public func stream(_ endpoint: Endpoint) -> AsyncThrowingStream<SSEEvent, Error> {
+        let script = sseScript
+        return AsyncThrowingStream { continuation in
+            for event in script {
+                continuation.yield(event)
+                if event.name == "done" || event.name == "error" { break }
+            }
+            continuation.finish()
+        }
+    }
+}

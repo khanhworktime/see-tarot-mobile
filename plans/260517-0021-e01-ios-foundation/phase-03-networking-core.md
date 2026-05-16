@@ -4,10 +4,17 @@ Context: `plan.md`, BE doc §2/§4, `docs/product/api-conventions.md`.
 
 ## Overview
 
-Priority: P0. Status: pending.
+Priority: P0. Status: done (2026-05-17).
 `SeeTarotNetworking`: `APIClientProtocol`, real `URLSession` client, request
 builder, error decoding, 401/429 handling, `set-auth-token` capture, and a
 reusable SSE consumer primitive (not UI-wired — consumed in E02).
+
+Evidence: `swift test` SeeTarotNetworking → 10/10 passed (URLProtocol mock:
+auth-providers, token capture, 401+hook, 400 issues, 403 entitlement,
+429→retry→200, sign-in→hydrate, sign-out clears, SSE parser). App BUILD
+SUCCEEDED; lint no errors. Note: added `.macOS(.v13)` to all package
+manifests so host `swift test` resolves modern availability (app still
+builds iOS via xcodebuild).
 
 ## Key Insights
 

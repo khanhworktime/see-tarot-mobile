@@ -4,7 +4,7 @@ import PackageDescription
 // SeeTarotDesignSystem: design tokens + shared SwiftUI components.
 let package = Package(
     name: "SeeTarotDesignSystem",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v13)],
     products: [.library(name: "SeeTarotDesignSystem", targets: ["SeeTarotDesignSystem"])],
     targets: [
         .target(
