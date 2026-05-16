@@ -9,6 +9,9 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public var authError: Error?
     public var sseScript: [SSEEvent] = []
     public private(set) var signedOut = false
+    /// Optional responder for generic `send` (e.g. onboarding). Returns the
+    /// JSON body to decode for a given endpoint.
+    public var sendResponder: (@Sendable (Endpoint) throws -> Data)?
 
     public init(sessionUser: SessionUser? = nil) {
         self.sessionUser = sessionUser
@@ -41,7 +44,10 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
 
     public func send<T: Decodable & Sendable>(_ endpoint: Endpoint,
                                               as type: T.Type) async throws -> T {
-        throw APIError.transport("StubAPIClient.send unconfigured for \(endpoint.path)")
+        guard let responder = sendResponder else {
+            throw APIError.transport("StubAPIClient.send unconfigured for \(endpoint.path)")
+        }
+        return try JSONDecoder.api.decode(T.self, from: try responder(endpoint))
     }
 
     public func stream(_ endpoint: Endpoint) -> AsyncThrowingStream<SSEEvent, Error> {

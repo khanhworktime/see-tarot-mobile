@@ -39,9 +39,13 @@ so E02–E05 build in parallel without rework. Scope = E01 only.
 | 02 | [Core domain models](phase-02-core-domain-models.md) | done | Codable types + envelope/SSE types + tests |
 | 03 | [Networking core](phase-03-networking-core.md) | done | APIClient protocol/real/stub, SSE seam |
 | 04 | [Persistence & secure storage](phase-04-persistence-secure-storage.md) | done | Keychain, SwiftData, artwork cache |
-| 05 | [Auth + session bootstrap](phase-05-auth-session-bootstrap.md) | pending | Email sign-in E2E, onboarding gate seam |
+| 05 | [Auth + session bootstrap](phase-05-auth-session-bootstrap.md) | done* | Email sign-in E2E, onboarding gate seam |
 | 06 | [DesignSystem & CardEngine seams](phase-06-designsystem-cardengine-seams.md) | pending | Tokens + Metal ambient spike |
 | 07 | [Verification & harness update](phase-07-verification-harness-update.md) | pending | Tests, smoke, TEST_MATRIX/evidence |
+
+\* Phase 05 `done*` = implementation + unit proof complete; the **live BE
+sign-in smoke is pending BE test credentials** (auto-skips, not faked). Resolve
+in Phase 07 once creds are provided.
 
 ## Dependencies
 

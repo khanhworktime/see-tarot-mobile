@@ -1,0 +1,26 @@
+import SwiftUI
+
+/// Routes by `AuthState`. Bootstraps the session on appear.
+public struct RootView: View {
+    @State private var auth: AuthStore
+
+    public init(auth: AuthStore) { self._auth = State(initialValue: auth) }
+
+    public var body: some View {
+        Group {
+            switch auth.state {
+            case .loading:
+                ProgressView("Loading…")
+            case .signedOut(let message):
+                SignInView(auth: auth, message: message)
+            case .authenticating:
+                ProgressView("Signing in…")
+            case .needsOnboarding(let user):
+                OnboardingView(auth: auth, user: user)
+            case .authenticated(let user):
+                HomeView(user: user) { Task { await auth.signOut() } }
+            }
+        }
+        .task { if case .loading = auth.state { await auth.bootstrap() } }
+    }
+}

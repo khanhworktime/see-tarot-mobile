@@ -3,10 +3,12 @@ import SeeTarotFeatures
 
 @main
 struct SeeTarotApp: App {
+    @State private var auth = AppComposition.makeAuthStore(
+        baseURL: AppConfig.apiBaseURL)
+
     var body: some Scene {
         WindowGroup {
-            // Phase 05 swaps this for RootView(authStore:) with DI + bootstrap.
-            FoundationRootView()
+            RootView(auth: auth)
         }
     }
 }

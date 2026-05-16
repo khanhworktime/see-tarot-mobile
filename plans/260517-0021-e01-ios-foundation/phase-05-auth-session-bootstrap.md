@@ -5,9 +5,21 @@ decision 0005.
 
 ## Overview
 
-Priority: P0 (hard gate: Auth). Status: pending.
+Priority: P0 (hard gate: Auth). Status: done* (2026-05-17).
 `SeeTarotFeatures` Auth: email sign-up/in end-to-end against live BE, launch
 session bootstrap, onboarding gate seam, Google seam (no flow).
+
+Evidence: AuthState/AuthStore (@Observable @MainActor), AuthService logic via
+APIClientProtocol, SignIn/SignUp/Onboarding/Home/RootView, AppComposition DI
+(resolves client↔store 401 cycle). `swift test` SeeTarotFeatures → 11/11
+auth state-machine tests pass (bootstrap variants, sign-in ok/invalid,
+stale-token clear, 401 handling, sign-out, onboarding→authenticated, Google
+availability). App BUILD SUCCEEDED + RootView runs on simulator.
+**BLOCKER (not faked):** live BE email sign-in smoke is env-gated and SKIPS
+until `SEE_TAROT_TEST_EMAIL/PASSWORD` provided — also the point to verify the
+`set-auth-token` header on the live 1.6.3 build. Carry to Phase 07.
+Note: iOS-only view modifiers guarded `#if os(iOS)` for host unit testing;
+added `public init` to `SessionUser`.
 
 ## Key Insights
 
