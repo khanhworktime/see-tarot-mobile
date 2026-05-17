@@ -5,10 +5,18 @@ Context: `plan.md`, decision 0004 (Core Animation, NOT Metal),
 
 ## Overview
 
-Priority: P0. Status: pending.
+Priority: P0. Status: done (2026-05-17).
 Real `CardSurface` implementation: a 3D card flip (face-down → face-up) via
 UIKit/Core Animation bridged into SwiftUI with `UIViewRepresentable`. Replaces
 `PlaceholderCardSurface`. 60fps target.
+
+Evidence: `FlipDecision` (pure: none/threeDFlip/crossFade) testable core;
+`FlipCardUIView` (UIView.transition flip + reduced-motion cross-fade, reversed
+artwork 180°); `FlipCardView` UIViewRepresentable `#if canImport(UIKit)`;
+`RealCardSurface` conforms to seam (host fallback). CardEngine 7/7 pass
+(3 FlipDecision logic + RealCardSurface). iOS BUILD SUCCEEDED; 0 source lint.
+Decision 0004 honored (Core Animation, no Metal). Async artwork deferred to
+Phase 03 (cache in UI layer). 60fps visual check in Phase 04.
 
 ## Requirements
 
