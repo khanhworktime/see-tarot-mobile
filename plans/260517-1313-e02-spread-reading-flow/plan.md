@@ -35,7 +35,7 @@ History list + reflections journal are E03 (out of scope).
 |---|-------|--------|--------|
 | 01 | [Reading API surface + stores](phase-01-reading-api-and-stores.md) | done | APIClient reading methods, Daily/Oracle stores + tests |
 | 02 | [Card flip animation](phase-02-card-flip-animation.md) | done | Real CardSurface (Core Animation) replacing placeholder |
-| 03 | [Reading UI screens](phase-03-reading-ui-screens.md) | pending | Home daily section, Oracle form, Reading view, QuotaChip |
+| 03 | [Reading UI screens](phase-03-reading-ui-screens.md) | done | Home daily section, Oracle form, Reading view, QuotaChip |
 | 04 | [Verification & harness update](phase-04-verification-harness-update.md) | pending | Tests, sim E2E, TEST_MATRIX/evidence |
 
 ## Dependencies

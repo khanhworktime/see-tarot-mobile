@@ -4,9 +4,17 @@ Context: `plan.md`, phases 01–02, `docs/product/readings.md`, DesignSystem.
 
 ## Overview
 
-Priority: P0. Status: pending.
+Priority: P0. Status: done (2026-05-17).
 SwiftUI screens wiring stores + flip cards: daily section in Home, Oracle form,
 Reading view (reveal + streaming), quota chip. DesignSystem tokens throughout.
+
+Evidence: IntentCopy (7 intents), QuotaChip+QuotaDisplay (null⇒∞),
+OracleFormView (client-validated submit), ReadingView (reveal+stream,
+.onDisappear→stop()), DailySection, HomeView rewritten (NavigationStack +
+HomeRoute enum, quota load), RootView passes apiClient. ReadingInput made
+Hashable in Core (nav routing). Tests: Features 23 (3 new UI-model, 1 live
+skip), Core 14 — all pass. iOS BUILD SUCCEEDED; 0 source lint warnings.
+Visual stub-driven sim check in Phase 04.
 
 ## Requirements
 

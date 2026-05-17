@@ -19,6 +19,9 @@ public final class AuthStore {
     private let tokenStore: TokenStoring
     private let encoder: JSONEncoder
 
+    /// Read-only access for authenticated feature stores (Daily/Oracle/quota).
+    public var apiClient: APIClientProtocol { client }
+
     public init(client: APIClientProtocol, tokenStore: TokenStoring,
                 encoder: JSONEncoder = .api) {
         self.client = client

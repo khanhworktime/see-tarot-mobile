@@ -2,10 +2,12 @@ import Foundation
 
 /// Input for generating a reading. Encoded to the BE `/readings/generate`
 /// (SSE) or `/readings/daily` request. Mirrors BE doc §3.2 / §5.
-public struct ReadingInput: Codable, Equatable, Sendable {
-    public enum Kind: String, Codable, Sendable { case daily, oracle }
-    public enum Spread: String, Codable, Sendable { case single, three, celtic }
-    public enum Intent: String, Codable, Sendable, CaseIterable {
+public struct ReadingInput: Codable, Hashable, Sendable {
+    public enum Kind: String, Codable, Hashable, Sendable { case daily, oracle }
+    public enum Spread: String, Codable, Hashable, Sendable {
+        case single, three, celtic
+    }
+    public enum Intent: String, Codable, Hashable, Sendable, CaseIterable {
         case general, love, career, finances, feeling, action, yesNo
     }
 
