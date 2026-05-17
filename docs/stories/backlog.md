@@ -13,7 +13,7 @@ See `spec-intake-see-tarot.md`.
 | Epic | Description | Status |
 | --- | --- | --- |
 | E01 | iOS foundation: modular SPM, networking protocol/stub, auth + Sign in with Apple, design system, seams | sliced (high-risk) → `epics/E01-ios-foundation/` |
-| E02 | Card spread + AI reading flow + animation | unsliced |
+| E02 | Card spread + AI reading flow + animation | sliced (normal) → `epics/E02-spread-reading-flow.md` |
 | E03 | History + offline artwork cache | unsliced |
 | E04 | Personalization (iOS interface; full needs BE module) | unsliced |
 | E05 | Subscription (StoreKit 2 + BE entitlement) | unsliced |
