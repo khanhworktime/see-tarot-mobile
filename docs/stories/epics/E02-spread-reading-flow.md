@@ -69,5 +69,9 @@ E02 builds against the unit-proven stack).
 
 ## Evidence
 
-Added after phased implementation + verification (see plan
-`plans/260517-1313-e02-spread-reading-flow/`).
+Verified 2026-05-17 — `plans/reports/verification-260517-e02-spread-reading-flow.md`.
+62 tests (61 pass / 0 fail / 1 live-smoke skip); iOS BUILD SUCCEEDED; 0 source
+lint; DEBUG stub composition visually confirms Home (quota `Oracle ∞`, daily
+flip card) + Oracle form (validation/celtic-hidden/spread). Commits
+7826846 (API+stores), 59a962c (flip animation), a547773 (UI screens), Phase 04.
+Status stays `in_progress`: live BE SSE/daily E2E pending creds (not faked).

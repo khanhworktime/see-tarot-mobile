@@ -4,10 +4,20 @@ Context: `plan.md`, story `E02-spread-reading-flow.md`, `docs/TEST_MATRIX.md`.
 
 ## Overview
 
-Priority: P0 (closes story). Status: pending.
+Priority: P0 (closes story). Status: done* (2026-05-17).
 Full verification, then harness evidence per Done Definition. Honest status —
 live SSE E2E pending BE (same blocker class as E01); unit/stub proof covers
 logic.
+
+Evidence: 62 tests (61 pass / 0 fail / 1 live skip); clean iOS BUILD
+SUCCEEDED; 0 source lint. DEBUG stub composition (`SEE_TAROT_UI_STUB=1`)
+visually confirms Home (quota `Oracle ∞`, daily flip card, brand button) +
+Oracle form (client validation, celtic hidden, spread segmented). TEST_MATRIX
+E02 → in_progress + evidence; story Evidence + plan statuses updated;
+verification report `plans/reports/verification-260517-e02-spread-reading-flow.md`.
+`*` story stays `in_progress` (not `implemented`) until live BE SSE/daily E2E
+passes — proof not faked. No new HARNESS_BACKLOG friction (validate-quick gap
+already filed in E01).
 
 ## Requirements
 

@@ -20,7 +20,7 @@ implemented until tests or validation evidence exist.
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | E01 iOS foundation | Modular iOS skeleton, APIClient (Live+Stub), Better Auth Bearer email sign-in + session bootstrap, persistence/design/animation seams | yes (46) | yes (mock URLProtocol, Keychain, SwiftData) | partial (sim launch; live BE sign-in pending creds) | yes (iOS17 build, cold start ~0.57s) | in_progress | `plans/reports/verification-260517-e01-ios-foundation.md`; commits 0c65fb1..483c5bb |
-| E02 spread+reading | Daily + Oracle reading flow (SSE), card flip animation, quota display | no | no | no | no | in_progress | `docs/stories/epics/E02-spread-reading-flow.md` |
+| E02 spread+reading | Daily + Oracle reading flow (SSE), card flip animation, quota display | yes (Core/Net/Features stores, FlipDecision, IntentCopy, QuotaDisplay) | yes (stub SSE script, mock URLProtocol) | partial (stub-driven sim UI; live BE SSE pending creds) | yes (iOS17 build; flip via Core Animation) | in_progress | `plans/reports/verification-260517-e02-spread-reading-flow.md`; commits 7826846..a547773 |
 | E03 history/offline | History + offline artwork cache | no | no | no | no | planned | none |
 | E04 personalization | BE-centric: profile + reflections; provider seam (AI module future BE) | no | no | no | no | planned | none |
 | E05 monetization | Deferred — quota/tier display from /quota; paywall TBD (separate brainstorm) | no | no | no | no | planned | none |
