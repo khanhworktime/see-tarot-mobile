@@ -1,4 +1,6 @@
 import SwiftUI
+import SeeTarotDesignSystem
+import SeeTarotCardEngine
 
 /// Routes by `AuthState`. Bootstraps the session on appear.
 public struct RootView: View {
@@ -21,6 +23,9 @@ public struct RootView: View {
                 HomeView(user: user) { Task { await auth.signOut() } }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AmbientBackgroundView())
+        .environment(\.designTokens, .default)
         .task { if case .loading = auth.state { await auth.bootstrap() } }
     }
 }

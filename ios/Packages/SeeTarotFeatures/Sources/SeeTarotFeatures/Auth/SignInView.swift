@@ -1,4 +1,5 @@
 import SwiftUI
+import SeeTarotDesignSystem
 
 /// Minimal email/password sign-in + sign-up toggle. Plain styling; Phase 06
 /// restyles with DesignSystem. Google button shown only when available (seam —
@@ -26,7 +27,7 @@ public struct SignInView: View {
             emailField
             SecureField("Password", text: $password)
                 .textContentType(isSignUp ? .newPassword : .password)
-            Button(isSignUp ? "Create account" : "Sign in") {
+            PrimaryButton(isSignUp ? "Create account" : "Sign in") {
                 Task {
                     if isSignUp {
                         await auth.signUp(name: name, email: email, password: password)
@@ -35,7 +36,6 @@ public struct SignInView: View {
                     }
                 }
             }
-            .buttonStyle(.borderedProminent)
             .disabled(email.isEmpty || password.count < 6)
 
             Button(isSignUp ? "Have an account? Sign in"

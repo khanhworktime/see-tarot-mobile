@@ -1,6 +1,7 @@
-// SeeTarotDesignSystem — tokens + components. Filled in Phase 06.
-import SwiftUI
+import Foundation
 
+/// SeeTarotDesignSystem namespace. See `DesignTokens` (environment-injected)
+/// and `Components` (PrimaryButton, LoadingView). Native HIG + brand accent.
 public enum SeeTarotDesignSystem {
     public static let moduleName = "SeeTarotDesignSystem"
 }

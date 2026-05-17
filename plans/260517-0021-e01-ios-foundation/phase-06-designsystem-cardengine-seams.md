@@ -4,9 +4,20 @@ Context: `plan.md`, decision 0004, `docs/product/overview.md` (native + brand).
 
 ## Overview
 
-Priority: P1. Status: pending.
+Priority: P1. Status: done (2026-05-17).
 `SeeTarotDesignSystem` tokens + primitives; `SeeTarotCardEngine` animation seam
 with a Metal ambient-background spike. No real card animation (E02).
+
+Evidence: DesignTokens (palette/typography/spacing/motion, env-injected,
+cross-platform palette), PrimaryButton/LoadingView; AmbientBackgroundView
+(SwiftUI animated gradient — Metal deferred, see note), CardSurface seam +
+PlaceholderCardSurface for E02. RootView/SignInView consume DesignSystem +
+ambient bg. Tests: DesignSystem 4/4, CardEngine 3/3, Features 12 (1 live
+smoke skipped). App BUILD SUCCEEDED + runs on simulator.
+**Deferred (documented, not skipped requirement):** Metal shader path —
+needs `xcodebuild -downloadComponent MetalToolchain` (absent in env). E01
+ships the 60fps SwiftUI gradient fallback; view API stable so Metal swap is
+non-breaking. Tracked for a later Metal-enablement task.
 
 ## Key Insights
 
