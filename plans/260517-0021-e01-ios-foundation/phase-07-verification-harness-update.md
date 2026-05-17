@@ -5,8 +5,16 @@ Context: `plan.md`, story `validation.md`, `docs/TEST_MATRIX.md`,
 
 ## Overview
 
-Priority: P0 (closes the story). Status: pending.
+Priority: P0 (closes the story). Status: done* (2026-05-17).
 Run full verification, then update harness evidence per the Done Definition.
+
+Evidence: 47 tests (46 pass, 0 fail, 1 skipped live smoke); clean xcodebuild
+SUCCEEDED; cold launch ≈0.57s; SwiftLint 0/0. TEST_MATRIX E01 row →
+`in_progress` with evidence; validation.md ladder + acceptance filled; story
+overview status set; verification report written
+(`plans/reports/verification-260517-e01-ios-foundation.md`). `*` story
+remains `in_progress` (not `implemented`) until the live BE sign-in smoke
+passes — honest per dev rules, proof not faked.
 
 ## Key Insights
 

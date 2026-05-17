@@ -1,5 +1,12 @@
 # Overview — E01 iOS Foundation
 
+## Status
+
+in_progress (2026-05-17) — implementation + 46 automated proofs complete and
+verified; story stays `in_progress` pending the live BE email sign-in smoke
+(needs BE test creds). See
+`plans/reports/verification-260517-e01-ios-foundation.md`.
+
 ## Current Behavior
 
 No mobile app. Repo holds harness only. BE (`api.seetarot.com`) is live with

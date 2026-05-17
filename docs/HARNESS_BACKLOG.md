@@ -70,3 +70,35 @@ normal
 
 proposed
 
+## Missing Harness Capability
+
+### Title
+
+No project validation script (`validate:quick`)
+
+### Discovered While
+
+E01 iOS foundation, phases 01–07.
+
+### Current Pain
+
+`docs/HARNESS.md` defines a Future Validation Ladder but no runnable entry
+point exists. Every phase re-derived the same `swift test` / `xcodebuild` /
+`swiftlint` commands by hand; the verification phase had to hand-document them
+into the story `validation.md`. Repeated manual reasoning + drift risk.
+
+### Suggested Improvement
+
+Add a repo validation entry point (e.g. `scripts/validate-quick.sh` or a
+documented command list) that runs per-package `swift test`, the iOS
+`xcodebuild`, and `swiftlint`, so phases reference one command instead of
+re-deriving. Wire into the harness validation ladder.
+
+### Risk
+
+tiny
+
+### Status
+
+proposed
+

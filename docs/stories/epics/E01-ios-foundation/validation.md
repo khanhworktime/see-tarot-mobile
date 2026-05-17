@@ -27,14 +27,40 @@ deferred (documented BE-config blocker, not a weakened requirement).
 
 ## Commands
 
-No validation scripts yet (Harness v0). Add `xcodebuild test` + `swiftlint` to
-the ladder when `ios/` toolchain exists.
+`ios/` toolchain now exists. Validation ladder for E01:
 
 ```text
-TBD
+# unit + integration (per package, host)
+cd ios/Packages/<Pkg> && swift test
+
+# build (iOS simulator)
+cd ios && xcodebuild -project SeeTarot.xcodeproj -scheme SeeTarot \
+  -destination 'generic/platform=iOS Simulator' -configuration Debug \
+  -derivedDataPath ./.xcdd build
+
+# lint
+cd ios && swiftlint lint --quiet
+
+# live BE sign-in smoke (env-gated; pending creds)
+SEE_TAROT_TEST_EMAIL=… SEE_TAROT_TEST_PASSWORD=… \
+  swift test --filter LiveSignInSmokeTests
 ```
 
 ## Acceptance Evidence
 
-Add xcodebuild test output, simulator recording, lint report, live sign-in
-smoke log after implementation.
+Verified 2026-05-17 — see
+`plans/reports/verification-260517-e01-ios-foundation.md`.
+
+- Tests: 47 total → 46 pass, 0 fail, 1 skipped (live smoke). Per package:
+  Core 14, Networking 10, Persistence 4, DesignSystem 4, CardEngine 3,
+  Features 12 (1 skipped).
+- Build: `xcodebuild` → BUILD SUCCEEDED (clean); each SPM package builds
+  standalone.
+- Platform: app installs + launches on iOS 17 simulator; cold launch ≈0.57s
+  (< 2s target); ambient bg = SwiftUI gradient (Metal deferred — toolchain).
+- Lint: SwiftLint 0 warnings / 0 errors.
+- Commits: 0c65fb1, f048615, f580bc5, cf98229, b4ac1a6, 483c5bb.
+
+**Pending (documented, not faked):** live BE email sign-in smoke needs
+`SEE_TAROT_TEST_EMAIL/PASSWORD`; also confirms `set-auth-token` header on the
+live Better Auth 1.6.3 build. Story stays `in_progress` until this passes.

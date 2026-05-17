@@ -19,7 +19,7 @@ implemented until tests or validation evidence exist.
 
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| E01 iOS foundation | Modular iOS skeleton, APIClient stub, Sign in with Apple → session, persistence/design/animation seams | no | no | no | no | planned | none |
+| E01 iOS foundation | Modular iOS skeleton, APIClient (Live+Stub), Better Auth Bearer email sign-in + session bootstrap, persistence/design/animation seams | yes (46) | yes (mock URLProtocol, Keychain, SwiftData) | partial (sim launch; live BE sign-in pending creds) | yes (iOS17 build, cold start ~0.57s) | in_progress | `plans/reports/verification-260517-e01-ios-foundation.md`; commits 0c65fb1..483c5bb |
 | E02 spread+reading | Card spread + AI reading flow + animation | no | no | no | no | planned | none |
 | E03 history/offline | History + offline artwork cache | no | no | no | no | planned | none |
 | E04 personalization | BE-centric: profile + reflections; provider seam (AI module future BE) | no | no | no | no | planned | none |
