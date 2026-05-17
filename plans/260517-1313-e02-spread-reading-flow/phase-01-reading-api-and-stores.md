@@ -4,9 +4,16 @@ Context: `plan.md`, BE doc §3.2–3.3 §4 §5, `docs/product/readings.md`.
 
 ## Overview
 
-Priority: P0. Status: pending.
+Priority: P0. Status: done (2026-05-17).
 Extend the API client with reading methods and add `@Observable` flow stores
 for Daily and Oracle. No UI yet. Stub-driven unit tests.
+
+Evidence: APIClientProtocol +dailyToday/drawDaily/quota/generate (Live ext
+reuses perform/stream, 204⇒nil; Stub fixtures). DailyReadingStore +
+OracleReadingStore (SSE consumer, handle() extracted for clarity, stop()
+cancels→aborts gen). Tests: Features 20 (8 new reading-store, 1 live skip),
+Core 14, Networking 10 — all pass. iOS BUILD SUCCEEDED; 0 source lint
+warnings. Added public init to Reading/ReadingCard (cross-module construct).
 
 ## Requirements
 

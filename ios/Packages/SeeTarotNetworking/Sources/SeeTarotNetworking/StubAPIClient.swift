@@ -9,6 +9,11 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public var authError: Error?
     public var sseScript: [SSEEvent] = []
     public private(set) var signedOut = false
+    // Reading fixtures (E02)
+    public var dailyTodayResult: Reading?
+    public var drawDailyResult: Result<Reading, Error>?
+    public var quotaResult: Quota = Quota(tier: "plus", dailyRemaining: 1,
+                                          oracleRemaining: nil)
     /// Optional responder for generic `send` (e.g. onboarding). Returns the
     /// JSON body to decode for a given endpoint.
     public var sendResponder: (@Sendable (Endpoint) throws -> Data)?
@@ -40,6 +45,23 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public func signOut() async throws {
         signedOut = true
         sessionUser = nil
+    }
+
+    public func dailyToday() async throws -> Reading? { dailyTodayResult }
+
+    public func drawDaily(tz: String) async throws -> Reading {
+        switch drawDailyResult {
+        case .success(let r): return r
+        case .failure(let e): throw e
+        case nil: throw APIError.badResponse
+        }
+    }
+
+    public func quota() async throws -> Quota { quotaResult }
+
+    public func generate(_ input: ReadingInput)
+        -> AsyncThrowingStream<SSEEvent, Error> {
+        stream(Endpoint(path: "readings/generate", method: .POST))
     }
 
     public func send<T: Decodable & Sendable>(_ endpoint: Endpoint,

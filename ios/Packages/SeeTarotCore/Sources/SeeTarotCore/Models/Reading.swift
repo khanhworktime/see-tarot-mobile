@@ -18,6 +18,19 @@ public struct Reading: Codable, Identifiable, Equatable, Sendable {
     public let cards: [ReadingCard]
     public let reflections: [Reflection]?
     public let isOwner: Bool
+
+    public init(id: String, userId: String, kind: String, spread: String,
+                intent: String?, question: String?, interpretation: String,
+                model: String, tier: String, isPublic: Bool, createdAt: String,
+                cards: [ReadingCard], reflections: [Reflection]?,
+                isOwner: Bool) {
+        self.id = id; self.userId = userId; self.kind = kind
+        self.spread = spread; self.intent = intent; self.question = question
+        self.interpretation = interpretation; self.model = model
+        self.tier = tier; self.isPublic = isPublic; self.createdAt = createdAt
+        self.cards = cards; self.reflections = reflections
+        self.isOwner = isOwner
+    }
 }
 
 /// A single drawn card within a reading. BE doc §5 / SSE `card` payload.
@@ -33,4 +46,15 @@ public struct ReadingCard: Codable, Identifiable, Equatable, Sendable {
     public let keywords: [String]
     public let uprightMeaning: String
     public let reversedMeaning: String
+
+    public init(id: String, name: String, arcana: String, suit: String?,
+                number: Int?, imageUrl: String?, position: Int,
+                reversed: Bool, keywords: [String], uprightMeaning: String,
+                reversedMeaning: String) {
+        self.id = id; self.name = name; self.arcana = arcana
+        self.suit = suit; self.number = number; self.imageUrl = imageUrl
+        self.position = position; self.reversed = reversed
+        self.keywords = keywords; self.uprightMeaning = uprightMeaning
+        self.reversedMeaning = reversedMeaning
+    }
 }

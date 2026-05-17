@@ -18,6 +18,16 @@ public protocol APIClientProtocol: Sendable {
     func getSession() async throws -> SessionUser?
     func signOut() async throws
 
+    // Readings (E02 surface)
+    /// `GET /readings/daily-today` — `nil` when `204` (not drawn today).
+    func dailyToday() async throws -> Reading?
+    /// `POST /readings/daily` — synchronous draw (once/day, never re-rolls).
+    func drawDaily(tz: String) async throws -> Reading
+    /// `GET /quota` — entitlement snapshot.
+    func quota() async throws -> Quota
+    /// `POST /readings/generate` — SSE stream (card → delta… → done|error).
+    func generate(_ input: ReadingInput) -> AsyncThrowingStream<SSEEvent, Error>
+
     // Generic primitives (consumed by later epics)
     func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T
     func stream(_ endpoint: Endpoint) -> AsyncThrowingStream<SSEEvent, Error>
