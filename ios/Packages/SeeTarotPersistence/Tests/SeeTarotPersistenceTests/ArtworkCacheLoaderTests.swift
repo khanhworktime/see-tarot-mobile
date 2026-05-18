@@ -58,6 +58,18 @@ final class ArtworkCacheLoaderTests: XCTestCase {
         XCTAssertEqual(data, Self.pngBlob)
     }
 
+    func testLoaderRejectsOversizePayload() async {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.protocolClasses = [OKImageProtocol.self]   // ~15-byte PNG blob
+        let loader = CardImageLoader(
+            cache: DiskArtworkCache(directory: tmpDir()),
+            session: URLSession(configuration: cfg),
+            maxBytes: 4)                                // smaller than payload
+        let data = await loader.image(
+            cardId: "big", url: URL(string: "https://x/big.png"))
+        XCTAssertNil(data, "payload over maxBytes must be rejected")
+    }
+
     func testLoaderNilUrlReturnsNil() async {
         let loader = CardImageLoader(cache: DiskArtworkCache(directory: tmpDir()))
         let data = await loader.image(cardId: "missing", url: nil)

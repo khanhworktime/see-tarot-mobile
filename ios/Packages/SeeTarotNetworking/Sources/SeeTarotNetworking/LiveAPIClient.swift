@@ -110,10 +110,15 @@ public final class LiveAPIClient: APIClientProtocol, @unchecked Sendable {
     public func getSession() async throws -> SessionUser? {
         let data = try await perform(Endpoint(path: "auth/get-session",
                                               method: .GET))
-        if let env = try? decoder.decode(SessionEnvelope.self, from: data) {
-            return env.user
-        }
-        return nil   // body was `null`
+        // Distinguish "no session" (literal `null`/empty body) from a decode
+        // failure: the former is a clean logged-out state; the latter means
+        // the BE contract shifted (e.g. NestJS migration) and MUST surface as
+        // an error — not be silently swallowed into a phantom sign-out.
+        let body = (String(bytes: data, encoding: .utf8) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if body.isEmpty || body == "null" { return nil }
+        do { return try decoder.decode(SessionEnvelope.self, from: data).user }
+        catch { throw APIError.decoding(String(describing: error)) }
     }
 
     public func signOut() async throws {

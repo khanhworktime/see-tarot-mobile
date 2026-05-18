@@ -170,5 +170,26 @@ tiny
 
 ### Status
 
-proposed
+implemented (2026-05-18) — `ios/scripts/validate-quick.sh`: per-package
+`swift test` (6 pkgs) + `swiftlint --strict`; env-gated live smokes run when
+`SEE_TAROT_TEST_*` set (else clean XCTSkip). iOS `xcodebuild` deliberately
+excluded (slow/simulator-bound; verification phases run it separately).
+Phases/CI now invoke one command.
+
+## Code-review follow-ups (reviewer-260518-1659 report)
+
+Tracked here for visibility; not harness-capability gaps.
+
+- **M3 resolved (2026-05-18):** `CardImageLoader` rejects artwork responses
+  `> maxBytes` (default 3 MB) before SVG rasterization (defense-in-depth vs
+  oversized/untrusted bytes). Test `testLoaderRejectsOversizePayload`.
+- **L3 resolved (2026-05-18):** `LiveAPIClient.getSession` returns nil only
+  for literal `null`/empty body; a type-mismatch / undecodable body now
+  throws `APIError.decoding` instead of a silent phantom sign-out (surfaces
+  BE contract drift during the NestJS migration). Tests
+  `GetSessionDecodeTests` (null/empty→nil, type-mismatch→throw, valid→user).
+- Open (deferred, low value): M2 (cache mtime LRU race — acceptable,
+  self-heals), M4 (birthDate-empty picker affordance), L1 (403+error always
+  entitlement), L4 (toggleVisibility silent catch), L5 (per-call JSON coder),
+  L6 (AppConfig fatalError — accepted invariant).
 

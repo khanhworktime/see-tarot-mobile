@@ -12,11 +12,17 @@ private let log = Logger(subsystem: "com.seetarot.app", category: "artwork")
 public actor CardImageLoader {
     private let cache: ArtworkCache
     private let session: URLSession
+    private let maxBytes: Int
 
+    /// Real card SVGs are ~365–450 KB; cap well above that and reject larger
+    /// payloads before handing untrusted bytes to the SVG rasterizer
+    /// (defense-in-depth vs a malformed/oversized response).
     public init(cache: ArtworkCache,
-                session: URLSession = CardImageLoader.makeSession()) {
+                session: URLSession = CardImageLoader.makeSession(),
+                maxBytes: Int = 3 * 1024 * 1024) {
         self.cache = cache
         self.session = session
+        self.maxBytes = maxBytes
     }
 
     public static func makeSession() -> URLSession {
@@ -45,6 +51,10 @@ public actor CardImageLoader {
             let code = (response as? HTTPURLResponse)?.statusCode ?? -1
             log.debug("fetch \(cardId, privacy: .public) http=\(code) bytes=\(data.count)")
             guard (200...299).contains(code), !data.isEmpty else {
+                return await staleSafeCache(cardId)
+            }
+            guard data.count <= maxBytes else {
+                log.error("oversize \(cardId, privacy: .public) bytes=\(data.count) > \(self.maxBytes)")
                 return await staleSafeCache(cardId)
             }
             let raster = Self.rasterizedIfSVG(data)
