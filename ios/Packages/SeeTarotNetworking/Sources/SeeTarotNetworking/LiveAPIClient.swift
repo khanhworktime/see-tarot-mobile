@@ -13,8 +13,18 @@ public final class LiveAPIClient: APIClientProtocol, @unchecked Sendable {
     let encoder: JSONEncoder
     private let onUnauthorized: @Sendable () -> Void
 
+    /// Bearer-only session: no cookie storage so the BE never sees a stale
+    /// session cookie (which would trip Better Auth CSRF / Origin checks).
+    public static func makeBearerSession() -> URLSession {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.httpCookieStorage = nil
+        cfg.httpShouldSetCookies = false
+        cfg.httpCookieAcceptPolicy = .never
+        return URLSession(configuration: cfg)
+    }
+
     public init(baseURL: URL, tokenStore: TokenStoring,
-                session: URLSession = .shared,
+                session: URLSession = LiveAPIClient.makeBearerSession(),
                 retry: RetryPolicy = RetryPolicy(),
                 decoder: JSONDecoder = .api, encoder: JSONEncoder = .api,
                 onUnauthorized: @escaping @Sendable () -> Void = {}) {

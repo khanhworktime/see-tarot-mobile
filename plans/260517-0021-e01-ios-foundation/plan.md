@@ -1,6 +1,6 @@
 ---
 title: E01 iOS Foundation
-status: in_progress
+status: done
 lane: high-risk
 created: 2026-05-17
 story: docs/stories/epics/E01-ios-foundation/

@@ -2,10 +2,12 @@
 
 ## Status
 
-in_progress (2026-05-17) — implementation + 46 automated proofs complete and
-verified; story stays `in_progress` pending the live BE email sign-in smoke
-(needs BE test creds). See
-`plans/reports/verification-260517-e01-ios-foundation.md`.
+implemented (2026-05-18) — implementation + automated proofs complete; live BE
+email sign-in smoke now PASSES against the real backend (local `:3001`),
+confirming `set-auth-token` capture + `/auth/get-session` hydration. Closing
+required fixing a real cookie/CSRF client bug (decision 0006). See
+`plans/reports/verification-260517-e01-ios-foundation.md` +
+`plans/reports/verification-260518-1201-live-be-close-e01-e02.md`.
 
 ## Current Behavior
 

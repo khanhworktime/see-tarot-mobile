@@ -11,6 +11,11 @@ public struct RequestBuilder: Sendable {
         let url = baseURL.appendingPathComponent(endpoint.path)
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method.rawValue
+        // Bearer-only client (Better Auth bearer mode). Never send/accept
+        // cookies: a lingering `tarot.session_token` cookie makes Better Auth
+        // enforce CSRF and reject state-changing calls with
+        // 403 MISSING_OR_NULL_ORIGIN. Auth is the captured set-auth-token.
+        request.httpShouldHandleCookies = false
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if endpoint.requiresAuth, let token, !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

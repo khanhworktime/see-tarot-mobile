@@ -2,7 +2,8 @@
 
 ## Status
 
-in_progress
+implemented (2026-05-18) — live BE smoke PASSES: real Oracle SSE
+(card→delta→done) + quota + daily draw against the running backend.
 
 ## Lane
 
@@ -69,9 +70,11 @@ E02 builds against the unit-proven stack).
 
 ## Evidence
 
-Verified 2026-05-17 — `plans/reports/verification-260517-e02-spread-reading-flow.md`.
-62 tests (61 pass / 0 fail / 1 live-smoke skip); iOS BUILD SUCCEEDED; 0 source
-lint; DEBUG stub composition visually confirms Home (quota `Oracle ∞`, daily
-flip card) + Oracle form (validation/celtic-hidden/spread). Commits
-7826846 (API+stores), 59a962c (flip animation), a547773 (UI screens), Phase 04.
-Status stays `in_progress`: live BE SSE/daily E2E pending creds (not faked).
+Verified 2026-05-17 — `plans/reports/verification-260517-e02-spread-reading-flow.md`
+(automated + stub UI). **Closed 2026-05-18** —
+`plans/reports/verification-260518-1201-live-be-close-e01-e02.md`: live BE
+smoke green (`LiveReadingSmokeTests`: real Oracle SSE card→delta→done; quota
+`plus`; daily draw) against the running backend. 64 tests total — live env:
+64 pass; no env: 61 pass + 3 live skip. Closing surfaced + fixed a real
+cookie/CSRF client bug (decision 0006). Commits 7826846 (API+stores),
+59a962c (flip), a547773 (UI), Phase 04, + live-close commit.

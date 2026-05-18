@@ -1,6 +1,6 @@
 ---
 title: E02 Spread + AI Reading Flow
-status: in_progress
+status: done
 lane: normal
 created: 2026-05-17
 story: docs/stories/epics/E02-spread-reading-flow.md
