@@ -17,6 +17,14 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     /// Optional responder for generic `send` (e.g. onboarding). Returns the
     /// JSON body to decode for a given endpoint.
     public var sendResponder: (@Sendable (Endpoint) throws -> Data)?
+    // History / reflections fixtures (E03). `historyPages` keyed by requested
+    // cursor (`nil` ⇒ first page) so pagination is deterministic.
+    public var historyPages: [String?: HistoryPage] = [:]
+    public var historyError: Error?
+    public var readingResult: Result<Reading, Error>?
+    public var reflectionsResult: [Reflection] = []
+    public var addReflectionResult: Result<String, Error> = .success("ref-1")
+    public var visibilityResult: Bool?
 
     public init(sessionUser: SessionUser? = nil) {
         self.sessionUser = sessionUser
@@ -62,6 +70,38 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public func generate(_ input: ReadingInput)
         -> AsyncThrowingStream<SSEEvent, Error> {
         stream(Endpoint(path: "readings/generate", method: .POST))
+    }
+
+    public func history(cursor: String?,
+                        limit: Int) async throws -> HistoryPage {
+        if let historyError { throw historyError }
+        return historyPages[cursor]
+            ?? HistoryPage(items: [], nextCursor: nil)
+    }
+
+    public func reading(id: String) async throws -> Reading {
+        switch readingResult {
+        case .success(let r): return r
+        case .failure(let e): throw e
+        case nil: throw APIError.http(status: 404, envelope: nil)
+        }
+    }
+
+    public func setVisibility(id: String,
+                              isPublic: Bool) async throws -> Bool {
+        visibilityResult ?? isPublic
+    }
+
+    public func addReflection(id: String, body: String,
+                              mood: String?) async throws -> String {
+        switch addReflectionResult {
+        case .success(let rid): return rid
+        case .failure(let e): throw e
+        }
+    }
+
+    public func reflections(id: String) async throws -> [Reflection] {
+        reflectionsResult
     }
 
     public func send<T: Decodable & Sendable>(_ endpoint: Endpoint,

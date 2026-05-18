@@ -8,7 +8,12 @@ public struct RequestBuilder: Sendable {
     public init(baseURL: URL) { self.baseURL = baseURL }
 
     public func makeRequest(_ endpoint: Endpoint, token: String?) -> URLRequest {
-        let url = baseURL.appendingPathComponent(endpoint.path)
+        var url = baseURL.appendingPathComponent(endpoint.path)
+        if !endpoint.queryItems.isEmpty,
+           var comps = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            comps.queryItems = endpoint.queryItems
+            if let withQuery = comps.url { url = withQuery }
+        }
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method.rawValue
         // Bearer-only client (Better Auth bearer mode). Never send/accept

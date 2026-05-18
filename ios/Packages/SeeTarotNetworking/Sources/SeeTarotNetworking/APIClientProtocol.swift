@@ -28,6 +28,18 @@ public protocol APIClientProtocol: Sendable {
     /// `POST /readings/generate` — SSE stream (card → delta… → done|error).
     func generate(_ input: ReadingInput) -> AsyncThrowingStream<SSEEvent, Error>
 
+    // History + reflections (E03 surface)
+    /// `GET /readings?cursor&limit` — cursor-paginated history (newest-first).
+    func history(cursor: String?, limit: Int) async throws -> HistoryPage
+    /// `GET /readings/{id}` — full reading (public; bearer sent if present).
+    func reading(id: String) async throws -> Reading
+    /// `PATCH /readings/{id}` `{isPublic}` — owner-only; returns new isPublic.
+    func setVisibility(id: String, isPublic: Bool) async throws -> Bool
+    /// `POST /readings/{id}/reflect` — returns the created reflection id.
+    func addReflection(id: String, body: String, mood: String?) async throws -> String
+    /// `GET /readings/{id}/reflections` — newest-first reflection list.
+    func reflections(id: String) async throws -> [Reflection]
+
     // Generic primitives (consumed by later epics)
     func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T
     func stream(_ endpoint: Endpoint) -> AsyncThrowingStream<SSEEvent, Error>

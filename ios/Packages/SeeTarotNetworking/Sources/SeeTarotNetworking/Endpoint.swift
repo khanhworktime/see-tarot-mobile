@@ -10,14 +10,19 @@ public struct Endpoint: Sendable {
     public let requiresAuth: Bool
     /// Override/add headers (e.g. Accept for SSE).
     public let extraHeaders: [String: String]
+    /// Query items appended via `URLComponents` (correctly percent-encoded —
+    /// `appendingPathComponent` would mangle `?`/`&`). Empty ⇒ no query.
+    public let queryItems: [URLQueryItem]
 
     public init(path: String, method: Method = .GET, body: Data? = nil,
-                requiresAuth: Bool = true, extraHeaders: [String: String] = [:]) {
+                requiresAuth: Bool = true, extraHeaders: [String: String] = [:],
+                queryItems: [URLQueryItem] = []) {
         self.path = path
         self.method = method
         self.body = body
         self.requiresAuth = requiresAuth
         self.extraHeaders = extraHeaders
+        self.queryItems = queryItems
     }
 
     public static func json<T: Encodable>(

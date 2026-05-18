@@ -11,9 +11,22 @@ public struct HistoryPage: Codable, Equatable, Sendable {
         /// ≤140 chars preview.
         public let preview: String
         public let createdAt: String
+
+        public init(id: String, kind: String, spread: String,
+                    intent: String?, question: String?, preview: String,
+                    createdAt: String) {
+            self.id = id; self.kind = kind; self.spread = spread
+            self.intent = intent; self.question = question
+            self.preview = preview; self.createdAt = createdAt
+        }
     }
 
     public let items: [Row]
     /// Pass back as `cursor`; `nil` ⇒ end of history.
     public let nextCursor: String?
+
+    public init(items: [Row], nextCursor: String?) {
+        self.items = items
+        self.nextCursor = nextCursor
+    }
 }
