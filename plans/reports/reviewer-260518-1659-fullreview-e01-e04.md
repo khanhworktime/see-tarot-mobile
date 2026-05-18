@@ -115,13 +115,25 @@ Proof: 104 unit/integration tests (Networking 24 incl. new
 `RetryPolicyIdempotencyTests` covering H1 both directions, 429-any-method, and
 the H3 sign-in-retry-on-null path), 0 fail; SwiftLint 0/0.
 
-**Live re-confirmation BLOCKED (not faked):** the BE now rejects the
-previously-working test account — direct `curl POST /auth/sign-in/email`
-returns `{"code":"INVALID_EMAIL_OR_PASSWORD"}` (BE-side change: DB reseed /
-NestJS-migration user reset, not a code regression — review fixes touch only
-RetryPolicy/LiveAPIClient/ProfileView/OracleReadingStore). All 4 live smokes
-fail solely on auth; they pass cleanly once valid creds exist. Stories stay
-`implemented` on prior live proof; the fixes are contract-preserving and
-unit-proven. Re-run the 4 live smokes when fresh creds are provided.
+**Live re-confirmation (2026-05-18, fresh account `admin@seetarot.com` /
+`SeeTarotAdmin2026!` after BE reseed):**
+- **E01 `LiveSignInSmokeTests` → PASS** (post review-fix: sign-in + token +
+  session hydrate; exercises H1 retry change + H3 getSession path).
+- **E04 `LiveProfileSmokeTests` → PASS** (post review-fix: `PATCH /profile`
+  name round-trip + restore).
+- **E03 `LiveHistorySmokeTests` → clean XCTSkip** ("account has no readings
+  yet") — fresh DB, by-design skip, not a fail.
+- **E02 `LiveReadingSmokeTests` → BLOCKED (BE-side, not faked):** BE AI
+  provider misconfigured — SSE error `ai provider gpt-4o-mini failed: 404
+  page not found`; daily `502 ai_failed`. The client **correctly receives and
+  maps** the SSE-error / 502 (review M1 non-retryable default behaves right) —
+  this is a BE regression, not a client defect. E03 live is transitively
+  blocked (can't create a reading without BE AI).
+
+Net: review fixes are unit-proven (104 tests) AND E01+E04 live-confirmed
+post-fix. E02/E03 live re-confirm pending the BE AI-provider fix (logged in
+HARNESS_BACKLOG). Stories E01–E04 stay `implemented` (E02/E03 had prior live
+proof when BE AI worked; fixes are contract-preserving + unit-proven). No
+faked green.
 
 M3 (SVG size-cap), M4 (birthDate affordance), L1–L6 → deferred to backlog.

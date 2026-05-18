@@ -87,6 +87,16 @@ Fastify→NestJS; divergences recorded as decision records.
 New open BE dependency (from #6): published IAP product IDs + entitlement /
 ASSN v2 → `/quota` propagation contract (decision 0007).
 
+**BE blocker (2026-05-18):** after the BE DB reseed, the AI provider is
+misconfigured — `POST /readings/generate` SSE emits
+`ai provider gpt-4o-mini failed: 404 page not found`; `POST /readings/daily`
+returns `502 ai_failed`. Blocks E02 live re-verify (and E03 transitively — a
+fresh account can't create a reading). Client handles it correctly
+(SSE-error/502 mapped, non-retryable). Also: `seed.ts` only seeds card
+master-data, not a test user — the admin account must be (re)created via
+Better Auth sign-up after any DB reset; a seeded mobile test account remains
+wanted (ask #7).
+
 ## Missing Harness Capability
 
 ### Title
