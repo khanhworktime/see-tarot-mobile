@@ -2,4 +2,4 @@
 // The $() splits the // so xcconfig does not treat it as a comment.
 // LAN IP so a physical iPhone on the same Wi-Fi reaches the Mac-hosted BE
 // (localhost only works on the simulator). Update if the Mac IP changes.
-API_BASE_URL = http:/$()/192.168.1.50:3001
+API_BASE_URL = http:/$()/192.168.1.100:3001

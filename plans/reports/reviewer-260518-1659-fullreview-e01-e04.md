@@ -130,10 +130,18 @@ the H3 sign-in-retry-on-null path), 0 fail; SwiftLint 0/0.
   this is a BE regression, not a client defect. E03 live is transitively
   blocked (can't create a reading without BE AI).
 
-Net: review fixes are unit-proven (104 tests) AND E01+E04 live-confirmed
-post-fix. E02/E03 live re-confirm pending the BE AI-provider fix (logged in
-HARNESS_BACKLOG). Stories E01–E04 stay `implemented` (E02/E03 had prior live
-proof when BE AI worked; fixes are contract-preserving + unit-proven). No
-faked green.
+**Update (2026-05-18 23:40, BE AI provider fixed + account reseeded):** all
+four live smokes now PASS post-review-fix —
+- E01 `LiveSignInSmokeTests` PASS
+- E02 `LiveReadingSmokeTests` PASS (Oracle SSE card→delta→done 6.6s; quota +
+  daily draw)
+- E03 `LiveHistorySmokeTests` PASS (history → reading → reflection echo →
+  visibility round-trip)
+- E04 `LiveProfileSmokeTests` PASS (PATCH /profile name round-trip + restore)
+
+**Live re-verify fully CLOSED.** Review fixes (H1/H2/H3/M1/Nit) are
+unit-proven (104 tests) AND live-confirmed across all four epics post-fix. No
+faked green. (Note: Mac LAN IP changed .50→.100 — `Debug.xcconfig` updated +
+xcodeproj regenerated for on-device testing.)
 
 M3 (SVG size-cap), M4 (birthDate affordance), L1–L6 → deferred to backlog.
