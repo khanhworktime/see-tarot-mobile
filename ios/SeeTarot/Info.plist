@@ -20,6 +20,13 @@
     <string>1</string>
     <key>API_BASE_URL</key>
     <string>$(API_BASE_URL)</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <!-- Allow cleartext HTTP only to local/link-local hosts (localhost BE
+             dev). Release uses https://api.seetarot.com so this is inert. -->
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
     <key>UILaunchScreen</key>
     <dict/>
 </dict>

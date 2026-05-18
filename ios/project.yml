@@ -39,6 +39,8 @@ targets:
         INFOPLIST_FILE: SeeTarot/Info.plist
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
+        DEVELOPMENT_TEAM: 2BMZMX95V3
+        CODE_SIGN_STYLE: Automatic
     dependencies:
       - package: SeeTarotFeatures
       - package: SeeTarotCore

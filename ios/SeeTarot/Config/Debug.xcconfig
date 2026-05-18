@@ -1,3 +1,5 @@
 // Debug build configuration. Local BE dev default. No secrets here.
 // The $() splits the // so xcconfig does not treat it as a comment.
-API_BASE_URL = http:/$()/localhost:3001
+// LAN IP so a physical iPhone on the same Wi-Fi reaches the Mac-hosted BE
+// (localhost only works on the simulator). Update if the Mac IP changes.
+API_BASE_URL = http:/$()/192.168.1.50:3001
