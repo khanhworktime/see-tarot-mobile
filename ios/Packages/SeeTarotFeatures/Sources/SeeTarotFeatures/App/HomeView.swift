@@ -1,6 +1,7 @@
 import SwiftUI
 import SeeTarotCore
 import SeeTarotNetworking
+import SeeTarotPersistence
 import SeeTarotDesignSystem
 
 /// Authenticated home: quota chip, today's energy card, entry to Oracle.
@@ -12,6 +13,7 @@ public struct HomeView: View {
     @State private var daily: DailyReadingStore
     @State private var quota: Quota?
     @State private var path: [HomeRoute] = []
+    private let imageLoader: CardImageLoader
 
     public init(client: APIClientProtocol, user: SessionUser,
                 onSignOut: @escaping () -> Void) {
@@ -19,6 +21,7 @@ public struct HomeView: View {
         self.user = user
         self.onSignOut = onSignOut
         self._daily = State(initialValue: DailyReadingStore(client: client))
+        self.imageLoader = PersistenceContainer.makeArtworkLoader()
     }
 
     public var body: some View {
@@ -30,6 +33,8 @@ public struct HomeView: View {
                     PrimaryButton("Ask the Oracle") {
                         path.append(.oracleForm)
                     }
+                    Button("Reading history") { path.append(.history) }
+                        .font(tokens.typography.body)
                     Button("Sign out", role: .destructive, action: onSignOut)
                         .font(tokens.typography.caption)
                 }
@@ -43,6 +48,17 @@ public struct HomeView: View {
                 case .reading(let input):
                     ReadingView(store: OracleReadingStore(client: client),
                                 input: input)
+                case .history:
+                    HistoryListView(store: HistoryStore(client: client)) { id in
+                        path.append(.readingDetail(id))
+                    }
+                case .readingDetail(let id):
+                    ReadingDetailView(
+                        id: id,
+                        store: ReadingDetailStore(client: client),
+                        reflections: ReflectionsStore(client: client,
+                                                      readingId: id),
+                        loader: imageLoader)
                 }
             }
             .task { quota = try? await client.quota() }
@@ -54,4 +70,6 @@ public struct HomeView: View {
 enum HomeRoute: Hashable {
     case oracleForm
     case reading(ReadingInput)
+    case history
+    case readingDetail(String)
 }

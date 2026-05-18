@@ -58,6 +58,24 @@ public enum AppComposition {
             SSEEvent(name: "delta", data: Data(#"{"delta":"your path."}"#.utf8)),
             SSEEvent(name: "done", data: Data(#"{"readingId":"r1"}"#.utf8))
         ]
+        // E03 history/reflection fixtures for offline UI verification.
+        stub.historyPages = [
+            nil: HistoryPage(items: [
+                HistoryPage.Row(id: "d1", kind: "daily", spread: "single",
+                                intent: "general", question: nil,
+                                preview: "The Sun brings clarity and warmth.",
+                                createdAt: "2026-05-17T00:00:00Z"),
+                HistoryPage.Row(id: "o1", kind: "oracle", spread: "single",
+                                intent: "career", question: "Next step?",
+                                preview: "The Star points to renewed hope.",
+                                createdAt: "2026-05-16T00:00:00Z")
+            ], nextCursor: nil)
+        ]
+        stub.readingResult = .success(stub.dailyTodayResult!)
+        stub.reflectionsResult = [
+            Reflection(id: "rf1", body: "Felt grounded after this one.",
+                       mood: "calm", createdAt: "2026-05-17T08:00:00Z")
+        ]
         // Token present ⇒ bootstrap() hydrates via the stub → authenticated.
         let store = AuthStore(client: stub,
                               tokenStore: InMemoryTokenStore(token: "stub"))
