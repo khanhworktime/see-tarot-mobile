@@ -62,6 +62,10 @@ struct ReadingDetailView: View {
                              busy: store.togglingVisibility) {
                 Task { await store.toggleVisibility() }
             }
+            if let err = store.visibilityError {
+                Text(err).font(tokens.typography.caption)
+                    .foregroundStyle(.red)
+            }
         }
         Divider()
         ReflectionsSection(store: reflections)

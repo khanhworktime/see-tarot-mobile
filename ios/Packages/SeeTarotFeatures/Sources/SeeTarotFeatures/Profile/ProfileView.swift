@@ -42,9 +42,18 @@ struct ProfileView: View {
                 error(.name)
             }
             Section("Birth date") {
-                DatePicker("Birth date", selection: birthDate,
-                           displayedComponents: .date)
-                    .datePickerStyle(.compact)
+                if store.birthDate.isEmpty {
+                    // No birthDate yet — don't silently show "today" in a
+                    // picker (a stray tap would write today). Require an
+                    // explicit action that seeds a neutral default.
+                    Button("Set birth date") {
+                        store.birthDate = Self.isoDay.string(from: Date())
+                    }
+                } else {
+                    DatePicker("Birth date", selection: birthDate,
+                               displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                }
                 error(.birthDate)
             }
             Section("Timezone") {

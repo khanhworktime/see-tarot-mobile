@@ -18,6 +18,8 @@ public final class ReadingDetailStore {
 
     public private(set) var state: State = .idle
     public private(set) var togglingVisibility = false
+    /// Transient message when a visibility toggle fails (cleared on retry).
+    public private(set) var visibilityError: String?
     private let client: APIClientProtocol
 
     public init(client: APIClientProtocol) {
@@ -42,14 +44,16 @@ public final class ReadingDetailStore {
             return
         }
         togglingVisibility = true
+        visibilityError = nil
         defer { togglingVisibility = false }
         do {
             let now = try await client.setVisibility(
                 id: reading.id, isPublic: !reading.isPublic)
             state = .loaded(reading.with(isPublic: now))
         } catch {
-            // Keep the existing reading; surface a transient flag-free failure
-            // by leaving state unchanged (UI re-enables the toggle).
+            // Keep the existing reading; surface a transient error the view
+            // can show. UI re-enables the toggle for retry.
+            visibilityError = "Couldn't update visibility. Tap to retry."
         }
     }
 }

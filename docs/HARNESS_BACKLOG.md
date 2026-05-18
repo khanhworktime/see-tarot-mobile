@@ -188,8 +188,19 @@ Tracked here for visibility; not harness-capability gaps.
   throws `APIError.decoding` instead of a silent phantom sign-out (surfaces
   BE contract drift during the NestJS migration). Tests
   `GetSessionDecodeTests` (null/empty→nil, type-mismatch→throw, valid→user).
-- Open (deferred, low value): M2 (cache mtime LRU race — acceptable,
-  self-heals), M4 (birthDate-empty picker affordance), L1 (403+error always
-  entitlement), L4 (toggleVisibility silent catch), L5 (per-call JSON coder),
-  L6 (AppConfig fatalError — accepted invariant).
+- **M4 resolved (2026-05-18):** `ProfileView` shows an explicit "Set birth
+  date" action when none is set (no stray-tap writing today).
+- **L4 resolved (2026-05-18):** `ReadingDetailStore.visibilityError` surfaced
+  in `ReadingDetailView` (no more silent toggle failure).
+- **L5 resolved (2026-05-18):** `JSONDecoder/JSONEncoder.api` are now shared
+  singletons (no per-request allocation).
+- **Accepted as-is (won't fix — rationale recorded):** M2 cache mtime LRU
+  race (pure-optimization cache, self-heals on miss — in-memory recency would
+  be churn for no correctness gain); L1 403+error→entitlement (BE only emits
+  403 for entitlements; remapping risks misclassifying real gates — revisit
+  only if BE adds non-entitlement 403s); L6 `AppConfig` fatalError on missing
+  build key (correct fail-fast for a config invariant).
+
+All client code-review follow-ups are now either resolved or explicitly
+accepted; nothing actionable remains in this section.
 
