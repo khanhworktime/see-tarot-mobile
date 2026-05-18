@@ -40,6 +40,12 @@ public protocol APIClientProtocol: Sendable {
     /// `GET /readings/{id}/reflections` — newest-first reflection list.
     func reflections(id: String) async throws -> [Reflection]
 
+    // Profile (E04 surface)
+    /// `PATCH /profile` — sends only non-nil fields (≥1 required); re-hydrates
+    /// via `getSession` and returns the refreshed user.
+    func updateProfile(name: String?, birthDate: String?, timezone: String?,
+                       preferredIntent: String?) async throws -> SessionUser?
+
     // Generic primitives (consumed by later epics)
     func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T
     func stream(_ endpoint: Endpoint) -> AsyncThrowingStream<SSEEvent, Error>

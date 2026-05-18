@@ -25,6 +25,11 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public var reflectionsResult: [Reflection] = []
     public var addReflectionResult: Result<String, Error> = .success("ref-1")
     public var visibilityResult: Bool?
+    // Profile (E04). Default: echo dirty fields merged onto `sessionUser`.
+    public var updateProfileResult: Result<SessionUser?, Error>?
+    public private(set) var lastUpdateProfileArgs:
+        (name: String?, birthDate: String?, timezone: String?,
+         preferredIntent: String?)?
 
     public init(sessionUser: SessionUser? = nil) {
         self.sessionUser = sessionUser
@@ -102,6 +107,27 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
 
     public func reflections(id: String) async throws -> [Reflection] {
         reflectionsResult
+    }
+
+    public func updateProfile(name: String?, birthDate: String?,
+                              timezone: String?,
+                              preferredIntent: String?) async throws -> SessionUser? {
+        lastUpdateProfileArgs = (name, birthDate, timezone, preferredIntent)
+        if let updateProfileResult {
+            return try updateProfileResult.get()
+        }
+        guard let u = sessionUser else { return nil }
+        // Default: merge dirty fields onto the current user.
+        let merged = SessionUser(
+            id: u.id, name: name ?? u.name, email: u.email, tier: u.tier,
+            subscriptionStatus: u.subscriptionStatus,
+            subscriptionRenewsAt: u.subscriptionRenewsAt,
+            kofiEmail: u.kofiEmail, birthDate: birthDate ?? u.birthDate,
+            timezone: timezone ?? u.timezone,
+            preferredIntent: preferredIntent ?? u.preferredIntent,
+            onboardedAt: u.onboardedAt)
+        sessionUser = merged
+        return merged
     }
 
     public func send<T: Decodable & Sendable>(_ endpoint: Endpoint,

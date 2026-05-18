@@ -84,6 +84,15 @@ public final class AuthStore {
         }
     }
 
+    /// Re-hydrate the session after a profile change (E04). On success routes
+    /// to the updated user; on nil leaves state (true auth loss is handled by
+    /// the 401 sign-out hook, not here).
+    public func refreshSession() async {
+        if let user = try? await client.getSession() {
+            state = route(user)
+        }
+    }
+
     public func signOut() async {
         try? await client.signOut()
         tokenStore.setToken(nil)
