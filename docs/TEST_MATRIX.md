@@ -23,7 +23,7 @@ implemented until tests or validation evidence exist.
 | E02 spread+reading | Daily + Oracle reading flow (SSE), card flip animation, quota display | yes (Core/Net/Features stores, FlipDecision, IntentCopy, QuotaDisplay) | yes (stub SSE script, mock URLProtocol) | yes (live BE: real Oracle SSE card→delta→done, quota, daily draw) | yes (iOS17 build; flip via Core Animation) | implemented | `verification-260518-1201-live-be-close-e01-e02.md`; commits 7826846..a547773 + live-close |
 | E03 history/offline | Cursor-paginated history, reading detail, append-only reflections, owner visibility toggle, bounded offline artwork cache | yes (Core/Net/Persistence/Features: pagination, validation, eviction, decode) | yes (mock URLProtocol history/reflect/visibility; ArtworkCache disk round-trip + eviction) | yes (live BE: history→reading→reflection echo→visibility round-trip; sim nav Home→History→Detail) | yes (iOS17 build; sim run) | implemented | `plans/reports/verification-260518-1229-e03-history-reflections-offline.md`; commits 9e760ab..34d2b8f + phase 04 |
 | E04 personalization | BE-centric: profile + reflections; provider seam (AI module future BE) | no | no | no | no | planned | none |
-| E05 monetization | Deferred — quota/tier display from /quota; paywall TBD (separate brainstorm) | no | no | no | no | planned | none |
+| E05 monetization | StoreKit 2 IAP subscription (Ko-fi dropped); entitlement via /quota+session. Deferred — BE IAP contract in planning (decision 0007) | no | no | no | no | planned | none (deferred) |
 | E06 android | Android app mirrors iOS contract | no | no | no | no | planned | none |
 
 ## Evidence Rules

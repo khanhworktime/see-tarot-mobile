@@ -68,7 +68,61 @@ normal
 
 ### Status
 
-proposed
+accepted — interim convention in use: the `tarot-contract` MCP (live BE
+OpenAPI) is the authoritative consume-only source while BE migrates
+Fastify→NestJS; divergences recorded as decision records.
+
+### Cross-repo dependency status (snapshot 2026-05-18)
+
+| # | Ask | Status |
+|---|-----|--------|
+| 1 | Card artwork URLs | RESOLVED (BE live) — `imageUrl` now populated, **but `.svg`**; iOS cannot decode SVG at runtime → new client item below |
+| 2 | Apple sign-in (App Store 4.8) | RESOLVED — `/auth-providers` `apple:true` live |
+| 3 | Error envelope post-NestJS | INTENTIONAL drift — `{message}` (Better Auth) vs `{error,message?,issues?}` (app). Client must handle BOTH (follow-up when wiring social sign-in) |
+| 4 | AI personalization | RESOLVED — BE folds profile + 3 reflections into prompt server-side; no client work |
+| 5 | Google native sign-in | RESOLVED — `/auth/sign-in/social` `idToken` flow live; success = 200 + `set-auth-token` + user |
+| 6 | Monetization | REVERSED — Ko-fi dropped → StoreKit 2 IAP; see decision 0007; implementation deferred |
+| 7 | Test account | OPEN — shared `admin` used for smoke; dedicated non-admin + seed/reset still wanted |
+
+New open BE dependency (from #6): published IAP product IDs + entitlement /
+ASSN v2 → `/quota` propagation contract (decision 0007).
+
+## Missing Harness Capability
+
+### Title
+
+iOS runtime SVG artwork rendering
+
+### Discovered While
+
+E03 phase 04 verification + the 2026-05-18 BE dependency reconciliation. BE now
+serves card artwork as `image/svg+xml` (e.g.
+`.../cards/nine-of-wands.svg`, ~440 KB, Illustrator-generated).
+
+### Current Pain
+
+`CardImage` decodes via `UIImage(data:)` / `NSImage(data:)`, which do NOT
+render raster SVG from network bytes (SwiftUI `Image` only handles SVG as a
+build-time bundled vector asset). So `imageUrl` is now live but cards still
+fall back to the `RealCardSurface` placeholder — E03 offline-artwork cannot be
+truly proven (cache logic is unit-proven; real render is blocked). Honest gap,
+not faked.
+
+### Suggested Improvement
+
+Decide an SVG strategy and add a phase: (a) pure-Swift SVG rasterizer SPM dep
+(e.g. SwiftDraw) → `UIImage`, cache the rasterized bytes; (b) ask BE to also
+serve PNG/PDF (content-negotiation or `?format=`); or (c) PDF variant
+(native). Then wire into `CardImage`/`CardImageLoader` and re-run the E03
+offline-artwork E2E (airplane mode).
+
+### Risk
+
+normal
+
+### Status
+
+proposed — awaiting strategy decision (a/b/c)
 
 ## Missing Harness Capability
 

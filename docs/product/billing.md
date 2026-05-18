@@ -1,33 +1,33 @@
-# Billing — v1 Free Launch (StoreKit deferred)
+# Billing — iOS IAP Subscription (deferred)
 
-Status: planned. Reconciled per decision 0005.
+Status: planned, deferred. Direction set by decision 0007 (supersedes the
+0005 free-launch / Ko-fi framing).
 
-## v1
+## v1 direction
 
-- Free launch: every authed user is effectively `plus`.
-- App renders quota/tier from `GET /quota` (`{ tier, dailyRemaining,
-  oracleRemaining }`) — never hardcode. `oracleRemaining` is **`null` on the
-  wire** when unlimited (`Infinity`→`JSON.stringify`→`null`): `null`/missing ⇒
-  unlimited, hide count; show number only when finite. Free launch ⇒ almost
-  always `null`.
-- User object carries `tier`, `subscriptionStatus`, `subscriptionRenewsAt`,
-  `kofiEmail` (display only in v1).
-- Ko-fi is server-side (`POST /kofi/webhook` not called by app). `POST
-  /kofi/claim { email }` MAY be surfaced to link a Ko-fi supporter email —
-  treat as account-link, not an in-app purchase.
+- Monetization = **iOS In-App Purchase auto-renewable subscription** (StoreKit
+  2). Ko-fi is **dropped** (no `kofi*` endpoints, no `kofiEmail` surfaced).
+- Entitlement is read from `GET /quota` + session (`tier`,
+  `subscriptionStatus`, `subscriptionRenewsAt`) — never hardcoded.
+  `oracleRemaining` is `null` on the wire when unlimited (`Infinity` →
+  `JSON.stringify` → `null`): `null`/missing ⇒ unlimited (hide count); show a
+  number only when finite.
+- BE owns receipt/transaction verification (App Store Server API) + ASSN v2
+  webhooks → propagates entitlement to `/quota`/session. App does StoreKit 2
+  purchase + `Transaction` listener + restore, then refreshes entitlement.
+- iOS keeps the entitlement-gating seam (reads `/quota`/session) so a paywall
+  drops in without rework.
 
-## Deferred (separate brainstorm)
+## Deferred (no client work yet)
 
-StoreKit 2 / paid tiers / IAP not decided. User: tiers TBD. Before any paid
-tier:
+Implementation deferred per user (2026-05-18); BE IAP contract in planning
+(5 phases), not live. E05 stays `planned`. No StoreKit code until BE publishes:
 
-- App Store policy: in-app unlock of digital content must use IAP — Ko-fi
-  cannot gate digital features purchased inside the app. Resolve in
-  monetization brainstorm.
-- iOS keeps an entitlement-gating seam reading from `/quota`/session so a
-  paywall can be added without rework.
+- Subscription product IDs + tier mapping.
+- Entitlement/verification contract + ASSN v2 → `/quota` propagation timing.
+- Restore / cross-platform (web) entitlement reconciliation on shared account.
 
 ## Open Questions
 
-- Tier model, prices, trial.
-- Web/Ko-fi ↔ future IAP entitlement reconciliation on shared account.
+- Tier model, prices, trial / introductory offer.
+- Grace period / billing-retry handling surfaced to the app.
