@@ -26,4 +26,10 @@ public enum PersistenceContainer {
                                         isStoredInMemoryOnly: inMemory)
         return try ModelContainer(for: schema, configurations: [config])
     }
+
+    /// Shared offline card-artwork loader (bounded disk cache) for Features.
+    public static func makeArtworkLoader(
+        maxBytes: Int = 64 * 1024 * 1024) -> CardImageLoader {
+        CardImageLoader(cache: DiskArtworkCache(maxBytes: maxBytes))
+    }
 }
