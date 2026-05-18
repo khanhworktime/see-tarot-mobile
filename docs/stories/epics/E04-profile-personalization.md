@@ -2,7 +2,11 @@
 
 ## Status
 
-planned
+implemented (2026-05-18) — live BE smoke PASSES (`PATCH /profile` name
+round-trip + restore via getSession re-hydrate); sim E2E confirms Profile
+reachable from Home, renders live session values, BE-mirrored validation, and
+401→sign-out seam. See
+`plans/reports/verification-260518-1635-e04-profile-personalization.md`.
 
 ## Lane
 
@@ -91,5 +95,14 @@ E03 networking patterns (`implemented`).
 
 ## Evidence
 
-(pending — populate on verification per Done Definition; no `implemented`
-without live proof)
+Verified 2026-05-18 —
+`plans/reports/verification-260518-1635-e04-profile-personalization.md`.
+100 tests / 6 packages (live env: 100 pass; no env: 95 pass + 5 live skip),
+0 fail; SwiftLint 0/0; iOS build + sim run clean. Live BE smoke
+`LiveProfileSmokeTests` PASSED: `PATCH /profile` name → echoes via
+`getSession` → restored. Sim E2E (live BE): Home→Profile renders live
+name/birthDate/timezone/intent; "Change at least one field" + Save-disabled
+until valid&dirty (mirrors BE); Save→401 routed to sign-out seam (correct —
+persisted sim token stale; happy-path save proven by live smoke, not the
+flaky sim re-login text entry — honest, not faked). Commits 1050716 (P01),
++ P02. AI personalization remains BE-side (no client work — decision 0005).

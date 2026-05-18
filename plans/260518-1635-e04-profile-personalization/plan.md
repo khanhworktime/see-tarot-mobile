@@ -1,7 +1,7 @@
 ---
 title: "E04 — Profile & Personalization (iOS client profile management)"
 description: "Authenticated user views/edits name, birthDate, timezone, preferredIntent via PATCH /profile; session refreshes in-app."
-status: planned
+status: completed
 lane: normal
 priority: P2
 effort: 5h
@@ -47,8 +47,8 @@ Errors: 400 `{error,issues[]}` → inline field messages; 401 → existing
 
 | # | Phase | Status | Deps |
 |---|-------|--------|------|
-| 01 | API surface + AuthStore.refreshSession + ProfileStore + unit tests | planned | — |
-| 02 | ProfileView + Home entry + DEBUG stub fixture + verification | planned | 01 |
+| 01 | API surface + AuthStore.refreshSession + ProfileStore + unit tests | done | — |
+| 02 | ProfileView + Home entry + DEBUG stub fixture + verification | done | 01 |
 
 ## Dependencies
 

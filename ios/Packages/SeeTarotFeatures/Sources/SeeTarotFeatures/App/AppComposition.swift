@@ -76,6 +76,8 @@ public enum AppComposition {
             Reflection(id: "rf1", body: "Felt grounded after this one.",
                        mood: "calm", createdAt: "2026-05-17T08:00:00Z")
         ]
+        // E04: profile save echoes back so the stub UI works offline.
+        stub.updateProfileResult = .success(user)
         // Token present ⇒ bootstrap() hydrates via the stub → authenticated.
         let store = AuthStore(client: stub,
                               tokenStore: InMemoryTokenStore(token: "stub"))

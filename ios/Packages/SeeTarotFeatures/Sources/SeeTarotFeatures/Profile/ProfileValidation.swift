@@ -11,8 +11,14 @@ public enum ProfileValidation {
     public static let intents = ["general", "love", "career", "finances",
                                  "feeling", "action", "yesNo"]
 
-    private static let birthDateRegex =
-        try! NSRegularExpression(pattern: "^\\d{4}-\\d{2}-\\d{2}$")
+    /// `^\d{4}-\d{2}-\d{2}$` without a force-unwrapped regex.
+    private static func isISODay(_ s: String) -> Bool {
+        let parts = s.split(separator: "-", omittingEmptySubsequences: false)
+        guard parts.count == 3,
+              parts[0].count == 4, parts[1].count == 2, parts[2].count == 2
+        else { return false }
+        return parts.allSatisfy { $0.allSatisfy(\.isNumber) }
+    }
 
     /// Validate the dirty payload. Empty input ⇒ the cross-field "≥1 field
     /// required" error keyed by `name` (form-level banner upstream).
@@ -31,7 +37,7 @@ public enum ProfileValidation {
         if let timezone, timezone.count < 1 || timezone.count > 64 {
             out[.timezone] = "Timezone must be 1–64 characters."
         }
-        if let birthDate, !matches(birthDateRegex, birthDate) {
+        if let birthDate, !isISODay(birthDate) {
             out[.birthDate] = "Birth date must be YYYY-MM-DD."
         }
         if let preferredIntent, !intents.contains(preferredIntent) {
@@ -42,10 +48,5 @@ public enum ProfileValidation {
             out[.name] = "Change at least one field."
         }
         return out
-    }
-
-    private static func matches(_ re: NSRegularExpression,
-                                _ s: String) -> Bool {
-        re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil
     }
 }

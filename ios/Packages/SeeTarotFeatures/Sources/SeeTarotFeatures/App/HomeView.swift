@@ -9,6 +9,7 @@ public struct HomeView: View {
     @Environment(\.designTokens) private var tokens
     private let client: APIClientProtocol
     private let user: SessionUser
+    private let auth: AuthStore
     private let onSignOut: () -> Void
     @State private var daily: DailyReadingStore
     @State private var quota: Quota?
@@ -16,9 +17,10 @@ public struct HomeView: View {
     private let imageLoader: CardImageLoader
 
     public init(client: APIClientProtocol, user: SessionUser,
-                onSignOut: @escaping () -> Void) {
+                auth: AuthStore, onSignOut: @escaping () -> Void) {
         self.client = client
         self.user = user
+        self.auth = auth
         self.onSignOut = onSignOut
         self._daily = State(initialValue: DailyReadingStore(client: client))
         self.imageLoader = PersistenceContainer.makeArtworkLoader()
@@ -34,6 +36,8 @@ public struct HomeView: View {
                         path.append(.oracleForm)
                     }
                     Button("Reading history") { path.append(.history) }
+                        .font(tokens.typography.body)
+                    Button("Profile") { path.append(.profile) }
                         .font(tokens.typography.body)
                     Button("Sign out", role: .destructive, action: onSignOut)
                         .font(tokens.typography.caption)
@@ -59,6 +63,8 @@ public struct HomeView: View {
                         reflections: ReflectionsStore(client: client,
                                                       readingId: id),
                         loader: imageLoader)
+                case .profile:
+                    ProfileView(store: ProfileStore(auth: auth, user: user))
                 }
             }
             .task { quota = try? await client.quota() }
@@ -72,4 +78,5 @@ enum HomeRoute: Hashable {
     case reading(ReadingInput)
     case history
     case readingDetail(String)
+    case profile
 }

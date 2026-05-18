@@ -5,13 +5,12 @@ import SeeTarotNetworking
 
 @MainActor
 final class ProfileStoreTests: XCTestCase {
-    private func user(_ overrides: (name: String?, bd: String?, tz: String?,
-                                    intent: String?) = (nil, nil, nil, nil))
+    private func user(name: String? = nil, bd: String? = nil,
+                      tz: String? = nil, intent: String? = nil)
         -> SessionUser {
-        SessionUser(id: "u1", name: overrides.name, email: "u@see.tarot",
-                    tier: "plus", birthDate: overrides.bd,
-                    timezone: overrides.tz,
-                    preferredIntent: overrides.intent,
+        SessionUser(id: "u1", name: name, email: "u@see.tarot",
+                    tier: "plus", birthDate: bd, timezone: tz,
+                    preferredIntent: intent,
                     onboardedAt: "2026-01-01T00:00:00Z")
     }
 
@@ -25,8 +24,8 @@ final class ProfileStoreTests: XCTestCase {
     }
 
     func testCleanFormCannotSave() async {
-        let u = user((name: "Neo", bd: "1990-01-01", tz: "Asia/Saigon",
-                      intent: "career"))
+        let u = user(name: "Neo", bd: "1990-01-01", tz: "Asia/Saigon",
+                     intent: "career")
         let (auth, _) = await makeAuth(u)
         let store = ProfileStore(auth: auth, user: u)
         XCTAssertFalse(store.isDirty)
@@ -34,8 +33,8 @@ final class ProfileStoreTests: XCTestCase {
     }
 
     func testDirtyValidEnablesSaveAndSendsOnlyChanged() async {
-        let u = user((name: "Neo", bd: "1990-01-01", tz: "Asia/Saigon",
-                      intent: "career"))
+        let u = user(name: "Neo", bd: "1990-01-01", tz: "Asia/Saigon",
+                     intent: "career")
         let (auth, stub) = await makeAuth(u)
         let store = ProfileStore(auth: auth, user: u)
         store.preferredIntent = "love"            // single dirty field
@@ -43,10 +42,10 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertTrue(store.canSave)
         await store.save()
         XCTAssertEqual(store.phase, .saved)
-        let args = stub.lastUpdateProfileArgs
-        XCTAssertEqual(args?.preferredIntent, "love")
-        XCTAssertNil(args?.name)
-        XCTAssertNil(args?.timezone)
+        let patch = stub.lastUpdateProfilePatch
+        XCTAssertEqual(patch?.preferredIntent, "love")
+        XCTAssertNil(patch?.name)
+        XCTAssertNil(patch?.timezone)
         XCTAssertEqual(auth.state.user?.preferredIntent, "love")
     }
 
@@ -69,7 +68,7 @@ final class ProfileStoreTests: XCTestCase {
     }
 
     func testInvalidFieldBlocksSave() async {
-        let u = user((name: "Neo", bd: nil, tz: nil, intent: nil))
+        let u = user(name: "Neo")
         let (auth, _) = await makeAuth(u)
         let store = ProfileStore(auth: auth, user: u)
         store.name = String(repeating: "x", count: 61)
@@ -77,11 +76,12 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertFalse(store.canSave)
     }
 
-    func testSave400MapsFieldErrors() async {
-        let u = user((name: "Neo", bd: nil, tz: nil, intent: nil))
+    func testSave400MapsFieldErrors() async throws {
+        let u = user(name: "Neo")
         let (auth, stub) = await makeAuth(u)
-        let env = try! JSONDecoder().decode(APIErrorEnvelope.self, from: Data(
-            #"{"error":"invalid body","issues":[{"path":["name"],"message":"nope"}]}"#.utf8))
+        let env = try XCTUnwrap(try? JSONDecoder().decode(
+            APIErrorEnvelope.self, from: Data(
+            #"{"error":"invalid body","issues":[{"path":["name"],"message":"nope"}]}"#.utf8)))
         stub.updateProfileResult = .failure(
             APIError.http(status: 400, envelope: env))
         let store = ProfileStore(auth: auth, user: u)
@@ -92,7 +92,7 @@ final class ProfileStoreTests: XCTestCase {
     }
 
     func testSave401NoInlineNoCrash() async {
-        let u = user((name: "Neo", bd: nil, tz: nil, intent: nil))
+        let u = user(name: "Neo")
         let (auth, stub) = await makeAuth(u)
         stub.updateProfileResult = .failure(APIError.unauthorized)
         let store = ProfileStore(auth: auth, user: u)

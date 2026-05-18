@@ -40,19 +40,15 @@ public final class ProfileStore {
     }
 
     /// Only the changed fields (nil = unchanged ⇒ not sent).
-    public var payload: (name: String?, birthDate: String?,
-                         timezone: String?, preferredIntent: String?) {
-        (dirty(name, original.name),
-         dirty(birthDate, original.birthDate),
-         dirty(timezone, original.timezone),
-         dirty(preferredIntent, original.preferredIntent))
+    public var payload: ProfilePatch {
+        ProfilePatch(name: dirty(name, original.name),
+                     birthDate: dirty(birthDate, original.birthDate),
+                     timezone: dirty(timezone, original.timezone),
+                     preferredIntent: dirty(preferredIntent,
+                                            original.preferredIntent))
     }
 
-    public var isDirty: Bool {
-        let p = payload
-        return p.name != nil || p.birthDate != nil || p.timezone != nil
-            || p.preferredIntent != nil
-    }
+    public var isDirty: Bool { !payload.isEmpty }
 
     public var validationErrors: [ProfileField: String] {
         let p = payload

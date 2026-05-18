@@ -20,7 +20,7 @@ public struct RootView: View {
             case .needsOnboarding(let user):
                 OnboardingView(auth: auth, user: user)
             case .authenticated(let user):
-                HomeView(client: auth.apiClient, user: user) {
+                HomeView(client: auth.apiClient, user: user, auth: auth) {
                     Task { await auth.signOut() }
                 }
             }

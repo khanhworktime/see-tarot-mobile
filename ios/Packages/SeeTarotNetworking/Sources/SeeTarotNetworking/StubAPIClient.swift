@@ -27,9 +27,7 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public var visibilityResult: Bool?
     // Profile (E04). Default: echo dirty fields merged onto `sessionUser`.
     public var updateProfileResult: Result<SessionUser?, Error>?
-    public private(set) var lastUpdateProfileArgs:
-        (name: String?, birthDate: String?, timezone: String?,
-         preferredIntent: String?)?
+    public private(set) var lastUpdateProfilePatch: ProfilePatch?
 
     public init(sessionUser: SessionUser? = nil) {
         self.sessionUser = sessionUser
@@ -112,7 +110,9 @@ public final class StubAPIClient: APIClientProtocol, @unchecked Sendable {
     public func updateProfile(name: String?, birthDate: String?,
                               timezone: String?,
                               preferredIntent: String?) async throws -> SessionUser? {
-        lastUpdateProfileArgs = (name, birthDate, timezone, preferredIntent)
+        lastUpdateProfilePatch = ProfilePatch(
+            name: name, birthDate: birthDate, timezone: timezone,
+            preferredIntent: preferredIntent)
         if let updateProfileResult {
             return try updateProfileResult.get()
         }

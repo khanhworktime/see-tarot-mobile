@@ -17,7 +17,9 @@ final class ProfileEndpointTests: XCTestCase {
     }
 
     private func bodyString(_ req: URLRequest) -> String {
-        if let b = req.httpBody { return String(decoding: b, as: UTF8.self) }
+        if let b = req.httpBody {
+            return String(bytes: b, encoding: .utf8) ?? ""
+        }
         guard let s = req.httpBodyStream else { return "" }
         s.open(); defer { s.close() }
         var data = Data(); var buf = [UInt8](repeating: 0, count: 4096)
@@ -26,7 +28,7 @@ final class ProfileEndpointTests: XCTestCase {
             if n <= 0 { break }
             data.append(buf, count: n)
         }
-        return String(decoding: data, as: UTF8.self)
+        return String(bytes: data, encoding: .utf8) ?? ""
     }
 
     func testUpdateSendsOnlyProvidedFieldsThenRehydrates() async throws {
