@@ -75,6 +75,24 @@ DesignSystem (4), CardEngine (7) unchanged from prior verification.
   `Info.plist NSAllowsLocalNetworking`, `project.yml` DEVELOPMENT_TEAM
   2BMZMX95V3 + automatic signing (separate from this close; same batch).
 
+## Simulator E2E (XcodeBuildMCP + ios-simulator MCP, vs live BE)
+
+Added 2026-05-18. App built+run on iPhone 17 sim (iOS 26.2), Debug config →
+live BE (`192.168.1.50:3001`). UI driven via accessibility automation:
+
+- E01: email sign-in (admin) → real Better Auth → **onboarding gate fired**
+  (`onboardedAt==nil`) → `POST /profile/onboard` → Home. Cookie/CSRF fix
+  (0006) confirmed in a real app process, not just host tests.
+- E02 daily: Home quota chips `Plus / Daily 1 / Oracle ∞` from live `/quota`;
+  "Today's energy" drew **King of Pentacles** with real AI interpretation.
+- E02 Oracle: form (topic General, spread Single/Three, celtic hidden,
+  client-validation gating Reveal) → live SSE `/readings/generate` →
+  card **Four of Swords** revealed → streamed AI text to `done`, with
+  cross-card personalization present.
+
+Establishes the repeatable simulator-E2E workflow; physical-device run is the
+user's next step (signing already wired, decision in 0006 batch).
+
 ## Not Attempted / Deferred
 
 - Physical-device run (signing wired; no device connected this session).
