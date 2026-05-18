@@ -9,11 +9,11 @@ import SeeTarotDesignSystem
 struct AddReflectionView: View {
     @Environment(\.designTokens) private var tokens
     let store: ReflectionsStore
-    @State private var body_ = ""
+    @State private var text = ""
     @State private var mood = ""
 
     private var trimmed: Int {
-        body_.trimmingCharacters(in: .whitespacesAndNewlines).count
+        text.trimmingCharacters(in: .whitespacesAndNewlines).count
     }
     private var valid: Bool { trimmed >= 3 && trimmed <= 2000
         && mood.count <= 24 }
@@ -21,7 +21,7 @@ struct AddReflectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: tokens.spacing.sm) {
             Text("Add a reflection").font(tokens.typography.heading)
-            TextEditor(text: $body_)
+            TextEditor(text: $text)
                 .frame(minHeight: 90)
                 .overlay(RoundedRectangle(cornerRadius: 8)
                     .stroke(.secondary.opacity(0.3)))
@@ -39,9 +39,9 @@ struct AddReflectionView: View {
             PrimaryButton(store.submitting ? "Saving…" : "Save reflection") {
                 Task {
                     if await store.add(
-                        body: body_,
+                        body: text,
                         mood: mood.isEmpty ? nil : mood) {
-                        body_ = ""; mood = ""
+                        text = ""; mood = ""
                     }
                 }
             }

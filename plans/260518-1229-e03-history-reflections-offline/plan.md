@@ -1,6 +1,6 @@
 ---
 title: E03 History + Reflections + Offline Artwork
-status: planned
+status: done
 lane: normal
 created: 2026-05-18
 story: docs/stories/epics/E03-history-reflections-offline.md
@@ -35,10 +35,10 @@ seams + E02 reading-render components (both `implemented`).
 
 | # | Phase | Status | Output |
 |---|-------|--------|--------|
-| 01 | [Contract reconcile + API surface + stores](phase-01-contract-api-stores.md) | planned | Reflection model reconciled; 5 API methods (Live+Stub); History/Detail/Reflections stores + tests |
-| 02 | [Offline artwork cache eviction + image loader](phase-02-artwork-cache-loader.md) | planned | Bounded eviction on `DiskArtworkCache`; async card-image loader (network→store→cache-first) + tests |
-| 03 | [History/Detail/Reflections UI + Home entry](phase-03-history-detail-ui.md) | planned | HistoryListView, ReadingDetailView (reuse E02), ReflectionsSection, AddReflectionView, visibility toggle, Home→History entry |
-| 04 | [Verification & harness update](phase-04-verification-harness.md) | planned | full swift test, lint, sim E2E vs live BE :3001, TEST_MATRIX/story/plan status, verification report |
+| 01 | [Contract reconcile + API surface + stores](phase-01-contract-api-stores.md) | done | Reflection model reconciled; 5 API methods (Live+Stub); History/Detail/Reflections stores + tests |
+| 02 | [Offline artwork cache eviction + image loader](phase-02-artwork-cache-loader.md) | done | Bounded eviction on `DiskArtworkCache`; async card-image loader (network→store→cache-first) + tests |
+| 03 | [History/Detail/Reflections UI + Home entry](phase-03-history-detail-ui.md) | done | HistoryListView, ReadingDetailView (reuse E02), ReflectionsSection, AddReflectionView, visibility toggle, Home→History entry |
+| 04 | [Verification & harness update](phase-04-verification-harness.md) | done | full swift test, lint, sim E2E vs live BE :3001, TEST_MATRIX/story/plan status, verification report |
 
 ## Dependencies
 

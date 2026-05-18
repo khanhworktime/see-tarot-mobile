@@ -2,7 +2,10 @@
 
 ## Status
 
-planned
+implemented (2026-05-18) — live BE smoke PASSES (history → reading →
+reflection echo → visibility round-trip); sim E2E confirms Home→History→Detail
+against the running backend. See
+`plans/reports/verification-260518-1229-e03-history-reflections-offline.md`.
 
 ## Lane
 
@@ -110,5 +113,17 @@ seams + E02 reading-render components (both `implemented`).
 
 ## Evidence
 
-(pending — populate on verification per Done Definition; do not mark
-`implemented` without live proof)
+Verified 2026-05-18 —
+`plans/reports/verification-260518-1229-e03-history-reflections-offline.md`.
+87 tests across 6 packages (live env: 87 pass; no env: 84 pass + 3 live skip),
+0 fail; SwiftLint 0 errors/0 warnings; iOS build + sim run clean. Live BE
+smoke `LiveHistorySmokeTests` PASSED: real history page → `GET /readings/{id}`
+→ `POST /readings/{id}/reflect` echoed back in `GET .../reflections` →
+`PATCH /readings/{id}` visibility flip + restore. Sim E2E (live BE): Home →
+"Reading history" → live paginated list (newest-first) → detail (card +
+interpretation + owner visibility toggle + reflections section + validated add
+form). Contract drift reconciled (`Reflection` → `{id,body,mood?,createdAt}`).
+Note: live readings return `imageUrl=nil` → `RealCardSurface` placeholder;
+offline-artwork cache/eviction is unit-proven (Phase 02) — no warm art to
+airplane-test in sim (honest: not faked). Commits 9e760ab (P01), fe09a90
+(P02), 34d2b8f (P03), + P04.

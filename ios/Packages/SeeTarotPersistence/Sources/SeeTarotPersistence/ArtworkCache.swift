@@ -63,13 +63,14 @@ public actor DiskArtworkCache: ArtworkCache {
         guard let entries = try? fm.contentsOfDirectory(
             at: directory, includingPropertiesForKeys: keys) else { return }
 
-        var sized: [(url: URL, size: Int, mtime: Date)] = []
+        struct Entry { let url: URL; let size: Int; let mtime: Date }
+        var sized: [Entry] = []
         var total = 0
         for file in entries {
             let v = try? file.resourceValues(forKeys: Set(keys))
             let size = v?.fileSize ?? 0
             let mtime = v?.contentModificationDate ?? .distantPast
-            sized.append((file, size, mtime))
+            sized.append(Entry(url: file, size: size, mtime: mtime))
             total += size
         }
         guard total > maxBytes else { return }
