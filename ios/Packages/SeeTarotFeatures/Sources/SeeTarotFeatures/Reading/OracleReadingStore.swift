@@ -34,6 +34,7 @@ public final class OracleReadingStore {
         if let error = input.clientValidationError {
             state = .invalid(error); return
         }
+        task?.cancel()   // abort any prior in-flight stream (stops burning quota)
         cards = []
         text = ""
         state = .revealing(cards: cards, text: text)
@@ -75,7 +76,9 @@ public final class OracleReadingStore {
             return true
         case "error":
             let f = try? decoder.decode(SSEPayload.Failure.self, from: event.data)
-            state = .failed(retryable: f?.retryable ?? true)
+            // Undecodable failure ⇒ treat as non-retryable (don't burn quota
+            // re-running an error the client can't reason about).
+            state = .failed(retryable: f?.retryable ?? false)
             return true
         default:
             break

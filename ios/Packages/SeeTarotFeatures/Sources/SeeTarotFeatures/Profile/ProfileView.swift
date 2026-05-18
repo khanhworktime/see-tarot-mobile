@@ -19,6 +19,16 @@ struct ProfileView: View {
         return f
     }()
 
+    /// Always include the current value so a nil / abbreviated /
+    /// non-canonical session timezone still has a selectable tag (else the
+    /// Picker has no match → unintended dirty / un-saveable form).
+    private var timezoneOptions: [String] {
+        let known = TimeZone.knownTimeZoneIdentifiers
+        let current = store.timezone
+        guard !current.isEmpty, !known.contains(current) else { return known }
+        return [current] + known
+    }
+
     private var birthDate: Binding<Date> {
         Binding(
             get: { Self.isoDay.date(from: store.birthDate) ?? Date() },
@@ -39,7 +49,7 @@ struct ProfileView: View {
             }
             Section("Timezone") {
                 Picker("Timezone", selection: $store.timezone) {
-                    ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) {
+                    ForEach(timezoneOptions, id: \.self) {
                         Text($0).tag($0)
                     }
                 }

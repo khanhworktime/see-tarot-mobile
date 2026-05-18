@@ -42,7 +42,9 @@ public final class LiveAPIClient: APIClientProtocol, @unchecked Sendable {
     /// status to typed errors. Returns validated body data.
     @discardableResult
     func perform(_ endpoint: Endpoint) async throws -> Data {
-        try await retry.run { [self] in
+        // Only GET is safe to replay on a transport error (a lost POST
+        // response may already be applied server-side). 429 still retries.
+        try await retry.run(idempotent: endpoint.method == .GET) { [self] in
             let request = builder.makeRequest(endpoint, token: tokenStore.token)
             let (data, response): (Data, URLResponse)
             do {
@@ -94,6 +96,11 @@ public final class LiveAPIClient: APIClientProtocol, @unchecked Sendable {
                                 body: try encoder.encode(body),
                                 requiresAuth: false)
         _ = try await perform(endpoint)
+        // Token is captured by now. `get-session` can momentarily return null
+        // right after issuance (read lag — esp. during the BE NestJS
+        // migration); retry once briefly before failing the sign-in.
+        if let user = try await getSession() { return user }
+        try? await Task.sleep(nanoseconds: 400_000_000)
         guard let user = try await getSession() else {
             throw APIError.badResponse
         }
