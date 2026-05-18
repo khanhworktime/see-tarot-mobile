@@ -69,14 +69,16 @@ Private/Make-public, `ReflectionsSection` "No reflections yet", validated
 
 ## Not Attempted / Deferred (documented, not faked)
 
-1. **Sim airplane-mode offline-artwork check** — UPDATE 2026-05-18: BE now
-   returns `imageUrl` live, but as `image/svg+xml`. iOS cannot decode raster
-   SVG at runtime (`UIImage(data:)`/SwiftUI `Image` need a build-time vector
-   asset), so `CardImage` still shows the `RealCardSurface` placeholder.
-   Offline cache + eviction remains unit-proven
-   (`ArtworkCacheLoaderTests`: fetch→store→offline-serve, LRU eviction). Real
-   on-device artwork render + airplane E2E is blocked on an SVG-rendering
-   strategy decision (HARNESS_BACKLOG item filed). Not faked.
+1. **Artwork — RESOLVED 2026-05-18.** BE serves `imageUrl` as
+   `image/svg+xml`; added SwiftDraw (SPM, `SeeTarotPersistence`).
+   `CardImageLoader` rasterizes SVG→PNG @2x on fetch and caches the raster;
+   an `isRaster` guard self-heals stale pre-SVG cache entries (root cause of
+   the initial placeholder: poisoned cache from earlier builds). Verified:
+   unit `testLoaderRasterizesSVGToPNGAndCachesRaster`; live sim oslog
+   `fetch nine-of-wands http=200 bytes=365936 → raster svg→png=120750`, card
+   renders on device. Cache hit thereafter = decodable PNG (offline-safe), so
+   the airplane-mode path is now exercised by the self-heal + cache logic
+   (unit-proven). Not faked.
 2. **Sim reflection text-entry** — simulator TextEditor focus via automation
    is unreliable (same limitation noted in E02). The add path is proven by the
    live smoke (real POST + echo) + unit tests, not faked in the screenshot.

@@ -76,7 +76,7 @@ Fastify→NestJS; divergences recorded as decision records.
 
 | # | Ask | Status |
 |---|-----|--------|
-| 1 | Card artwork URLs | RESOLVED (BE live) — `imageUrl` now populated, **but `.svg`**; iOS cannot decode SVG at runtime → new client item below |
+| 1 | Card artwork URLs | RESOLVED end-to-end — BE serves `imageUrl` (svg); client rasterizes via SwiftDraw → PNG, caches raster, renders + offline (see SVG item below = implemented) |
 | 2 | Apple sign-in (App Store 4.8) | RESOLVED — `/auth-providers` `apple:true` live |
 | 3 | Error envelope post-NestJS | INTENTIONAL drift — `{message}` (Better Auth) vs `{error,message?,issues?}` (app). Client must handle BOTH (follow-up when wiring social sign-in) |
 | 4 | AI personalization | RESOLVED — BE folds profile + 3 reflections into prompt server-side; no client work |
@@ -122,7 +122,12 @@ normal
 
 ### Status
 
-proposed — awaiting strategy decision (a/b/c)
+implemented (2026-05-18) — strategy (a) chosen: SwiftDraw SPM dep in
+`SeeTarotPersistence`. `CardImageLoader` rasterizes SVG → PNG @2x on fetch,
+caches the raster; `isRaster` guard self-heals stale pre-SVG cache entries.
+Verified: unit (`testLoaderRasterizesSVGToPNGAndCachesRaster`) + live sim
+(oslog `fetch http=200 365936B → raster svg→png=120750`; Nine of Wands renders
+on device).
 
 ## Missing Harness Capability
 

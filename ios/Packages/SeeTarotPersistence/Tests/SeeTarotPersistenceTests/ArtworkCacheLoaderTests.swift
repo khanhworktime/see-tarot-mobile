@@ -40,10 +40,14 @@ final class ArtworkCacheLoaderTests: XCTestCase {
         XCTAssertEqual(got, Data("img".utf8))
     }
 
+    /// Minimal bytes that pass `isRaster` (PNG signature + filler).
+    private static let pngBlob = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A,
+                                       0x1A, 0x0A] + Array("seetarot".utf8))
+
     func testLoaderCacheHitNoNetwork() async {
         let dir = tmpDir()
         let cache = DiskArtworkCache(directory: dir)
-        await cache.store(Data("cached".utf8), for: "c1")
+        await cache.store(Self.pngBlob, for: "c1")
         // Session that always fails — proves a hit needs no network.
         let cfg = URLSessionConfiguration.ephemeral
         cfg.protocolClasses = [AlwaysFailProtocol.self]
@@ -51,7 +55,7 @@ final class ArtworkCacheLoaderTests: XCTestCase {
                                      session: URLSession(configuration: cfg))
         let data = await loader.image(
             cardId: "c1", url: URL(string: "https://x/img.png"))
-        XCTAssertEqual(data, Data("cached".utf8))
+        XCTAssertEqual(data, Self.pngBlob)
     }
 
     func testLoaderNilUrlReturnsNil() async {
@@ -69,6 +73,23 @@ final class ArtworkCacheLoaderTests: XCTestCase {
         let data = await loader.image(
             cardId: "c2", url: URL(string: "https://x/y.png"))
         XCTAssertNil(data)
+    }
+
+    func testLoaderRasterizesSVGToPNGAndCachesRaster() async {
+        let dir = tmpDir()
+        let cache = DiskArtworkCache(directory: dir)
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.protocolClasses = [SVGProtocol.self]
+        let loader = CardImageLoader(cache: cache,
+                                     session: URLSession(configuration: cfg))
+        let out = await loader.image(
+            cardId: "svg1", url: URL(string: "https://x/the-sun.svg"))
+        // PNG magic 0x89 'P' 'N' 'G' — proves SVG was rasterized, not stored raw.
+        let png: [UInt8] = [0x89, 0x50, 0x4E, 0x47]
+        XCTAssertEqual(out?.prefix(4).map { $0 }, png)
+        let cached = await cache.data(for: "svg1")
+        XCTAssertEqual(cached?.prefix(4).map { $0 }, png,
+                       "cache must hold the rasterized PNG, not SVG")
     }
 
     func testLoaderFetchesStoresThenServesOffline() async {
@@ -102,8 +123,29 @@ private final class AlwaysFailProtocol: URLProtocol {
     override func stopLoading() {}
 }
 
+private final class SVGProtocol: URLProtocol {
+    static let svg = Data(#"""
+    <?xml version="1.0" encoding="UTF-8"?>
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" \#
+    viewBox="0 0 40 60"><rect width="40" height="60" fill="#5b3fa0"/></svg>
+    """#.utf8)
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for r: URLRequest) -> URLRequest { r }
+    override func startLoading() {
+        let resp = HTTPURLResponse(
+            url: request.url!, statusCode: 200, httpVersion: "HTTP/1.1",
+            headerFields: ["Content-Type": "image/svg+xml"])!
+        client?.urlProtocol(self, didReceive: resp,
+                            cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: SVGProtocol.svg)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
+}
+
 private final class OKImageProtocol: URLProtocol {
-    static let payload = Data("PNGBYTES".utf8)
+    static let payload = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+                              + Array("payload".utf8))
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for r: URLRequest) -> URLRequest { r }
     override func startLoading() {

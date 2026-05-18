@@ -123,10 +123,10 @@ smoke `LiveHistorySmokeTests` PASSED: real history page → `GET /readings/{id}`
 "Reading history" → live paginated list (newest-first) → detail (card +
 interpretation + owner visibility toggle + reflections section + validated add
 form). Contract drift reconciled (`Reflection` → `{id,body,mood?,createdAt}`).
-Note (updated 2026-05-18): BE now serves `imageUrl` live, but as
-`image/svg+xml`; iOS cannot decode raster SVG at runtime so `CardImage` still
-falls back to the `RealCardSurface` placeholder. Offline-artwork cache/eviction
-is unit-proven (Phase 02); real on-device artwork render + airplane-mode E2E is
-**blocked on an SVG-rendering decision** (HARNESS_BACKLOG: "iOS runtime SVG
-artwork rendering") — honest gap, not faked. Commits 9e760ab (P01), fe09a90
+Artwork (resolved 2026-05-18): BE serves `imageUrl` as `image/svg+xml`;
+`CardImageLoader` rasterizes SVG→PNG @2x via SwiftDraw, caches the raster
+(`isRaster` guard self-heals stale pre-SVG entries). Verified live on sim —
+oslog `fetch http=200 365936B → raster svg→png=120750`, Nine of Wands card
+renders on device; cache hit thereafter is offline-safe PNG. Unit:
+`testLoaderRasterizesSVGToPNGAndCachesRaster`. Commits 9e760ab (P01), fe09a90
 (P02), 34d2b8f (P03), + P04.
