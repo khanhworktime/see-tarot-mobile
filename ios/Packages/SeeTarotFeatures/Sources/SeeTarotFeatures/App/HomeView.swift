@@ -4,7 +4,23 @@ import SeeTarotNetworking
 import SeeTarotPersistence
 import SeeTarotDesignSystem
 
-/// Authenticated home: quota chip, today's energy card, entry to Oracle.
+// Phase 07: HomeView is superseded by MainTabView as the authenticated shell.
+// Retained as a compilable type so any external references do not break.
+// RootView now routes .authenticated → MainTabView (not HomeView).
+
+/// Navigation routes for the authenticated area.
+/// Kept internal; all tab stacks share this type via the module boundary.
+enum HomeRoute: Hashable {
+    case oracleForm
+    case reading(ReadingInput)
+    case history
+    case readingDetail(String)
+    case profile
+}
+
+/// Authenticated home — superseded by `MainTabView` in Phase 07.
+/// RootView no longer instantiates this type; it is kept for reference
+/// and to avoid breaking any snapshot tests that import it by name.
 public struct HomeView: View {
     @Environment(\.designTokens) private var tokens
     private let client: APIClientProtocol
@@ -70,13 +86,4 @@ public struct HomeView: View {
             .task { quota = try? await client.quota() }
         }
     }
-}
-
-/// Navigation routes for the authenticated area.
-enum HomeRoute: Hashable {
-    case oracleForm
-    case reading(ReadingInput)
-    case history
-    case readingDetail(String)
-    case profile
 }
