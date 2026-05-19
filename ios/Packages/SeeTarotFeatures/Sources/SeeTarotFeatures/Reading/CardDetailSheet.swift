@@ -29,11 +29,22 @@ public struct CardDetailSheet: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: tokens.spacing.lg) {
-                // ── Drag handle ────────────────────────────────────────────
-                Capsule()
-                    .fill(tokens.palette.accentSilver.opacity(0.4))
-                    .frame(width: 40, height: 4)
-                    .padding(.top, tokens.spacing.sm)
+                // ── Drag handle — tappable close affordance (L1) ───────────
+                // The capsule doubles as a real Button that calls dismiss(),
+                // satisfying both pointer/touch users and VoiceOver (explicit
+                // accessibilityLabel). Swipe-to-dismiss remains active
+                // (no .interactiveDismissDisabled is set).
+                Button {
+                    dismiss()
+                } label: {
+                    Capsule()
+                        .fill(tokens.palette.accentSilver.opacity(0.4))
+                        .frame(width: 40, height: 4)
+                        .padding(.top, tokens.spacing.sm)
+                        .contentShape(Rectangle().size(width: 80, height: 44))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close")
 
                 // ── Card art ───────────────────────────────────────────────
                 RealCardSurface(name: card.name, reversed: card.reversed)

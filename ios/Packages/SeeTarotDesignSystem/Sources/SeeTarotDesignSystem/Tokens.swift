@@ -71,12 +71,21 @@ public struct DesignTokens: Sendable {
     /// Each token scales with Dynamic Type via `Font.custom(_:size:relativeTo:)`,
     /// which uses the same UIFontMetrics scaling as system text styles.
     ///
-    /// PostScript names verified from bundled variable TTFs:
-    ///   Cinzel — "Cinzel-Regular", "CinzelRoman-Bold", "CinzelRoman-Black"
-    ///   Lora   — "Lora-Regular",   "Lora-Medium",      "Lora-SemiBold", "Lora-Bold"
+    /// H1-A: Resolution behaviour for each family:
+    ///   Cinzel — static-instance variable font whose named instances carry explicit
+    ///            PostScript-name records. Names are EXACT: "Cinzel-Regular",
+    ///            "CinzelRoman-Bold", "CinzelRoman-Black".
+    ///   Lora   — single-axis (wght 400–700) variable font. Its named instances carry
+    ///            NO PostScript-name records. CoreText auto-derives underscore-form names
+    ///            ("Lora-Regular_Medium" etc.) at runtime via fuzzy family matching.
+    ///            "Lora-Medium" therefore resolves correctly TODAY via CoreText fuzzy
+    ///            matching (verified: weight trait 0.2 = true Medium), but this relies
+    ///            on undocumented CoreText behaviour, not a guaranteed PostScript contract.
+    ///            FontWeightResolutionTests asserts the resolved weight traits so a future
+    ///            OS regression in name resolution fails CI.
     ///
-    /// System .serif (New York) is the automatic fallback when a custom font
-    /// cannot be loaded; SwiftUI resolves `Font.custom` gracefully.
+    /// System .serif (New York) is the fallback if the family is entirely absent;
+    /// for an unmatched weight within a present family the fallback is Lora-Regular.
     public struct Typography: Sendable {
         /// Display — Cinzel Black, large ceremonial use.
         public let display: Font
