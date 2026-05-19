@@ -94,6 +94,8 @@ public struct SpreadRitualView: View {
     @State private var holdProgress: Double = 0.0  // 0→1 while held
     @State private var holdTask: Task<Void, Never>? = nil
     @State private var containerSize: CGSize = .zero
+    /// H-B1: Latch making endHold idempotent across overlapping gesture .onEnded calls.
+    @State private var hasDealt: Bool = false
 
     // MARK: Timing constants
 
@@ -167,19 +169,11 @@ public struct SpreadRitualView: View {
             if phase == .fan || phase == .hold { holdRingOverlay }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // H-B1: Single gesture (redundant .simultaneousGesture removed); hasDealt latch
+        // in endHold() makes the deal path unconditionally idempotent.
         .gesture(
             LongPressGesture(minimumDuration: 0.0)
                 .simultaneously(with: DragGesture(minimumDistance: 0))
-                .onChanged { _ in
-                    guard phase == .fan || phase == .hold else { return }
-                    beginHold()
-                }
-                .onEnded { _ in
-                    endHold(triggeredDeal: true, in: containerSize)
-                }
-        )
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
                 .onChanged { _ in
                     guard phase == .fan || phase == .hold else { return }
                     beginHold()
@@ -263,6 +257,8 @@ public struct SpreadRitualView: View {
     // MARK: - Ritual timeline entry point
 
     private func startRitual(in size: CGSize) {
+        // H-B1: reset deal latch so a ritual restart allows a fresh deal.
+        hasDealt = false
         if reduceMotion {
             startReducedMotionPath(in: size)
         } else {
@@ -314,12 +310,17 @@ public struct SpreadRitualView: View {
     }
 
     private func endHold(triggeredDeal: Bool, in size: CGSize) {
+        // H-B1: hasDealt latch — second invocation from any source is a no-op.
+        guard !hasDealt else { return }
         guard isHolding || phase == .fan else { return }
         isHolding = false
         holdTask?.cancel()
         holdTask = nil
         convergeHook?.setConverging(false)
-        if triggeredDeal { performDeal(in: size) }
+        if triggeredDeal {
+            hasDealt = true
+            performDeal(in: size)
+        }
     }
 
     // MARK: Deal + staggered flip

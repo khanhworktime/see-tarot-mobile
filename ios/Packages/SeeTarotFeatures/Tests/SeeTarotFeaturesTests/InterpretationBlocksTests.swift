@@ -290,6 +290,86 @@ final class InterpretationBlocksTests: XCTestCase {
         XCTAssertEqual(partialBlocks[0].id, fullBlocks[0].id)
     }
 
+    // MARK: - Mx1: CRLF robustness
+
+    /// A CRLF stream must yield the same ids, titles, and bodies as the
+    /// equivalent LF stream (Mx1 normalisation).
+    func testCRLFInputEqualToLFInput() {
+        let lf = "### Card One\nFirst body.\n### Card Two\nSecond body."
+        let crlf = "### Card One\r\nFirst body.\r\n### Card Two\r\nSecond body."
+        let lfBlocks   = InterpretationBlocks.parse(lf)
+        let crlfBlocks = InterpretationBlocks.parse(crlf)
+        XCTAssertEqual(lfBlocks.map(\.id), crlfBlocks.map(\.id), "CRLF ids must match LF ids")
+        XCTAssertEqual(lfBlocks.map(\.title), crlfBlocks.map(\.title), "CRLF titles must match LF titles")
+        XCTAssertEqual(lfBlocks.map(\.body), crlfBlocks.map(\.body), "CRLF bodies must match LF bodies")
+    }
+
+    /// A lone-CR stream also normalises correctly (covers old Mac line endings).
+    func testLoneCRInputEqualToLFInput() {
+        let lf = "### Star\nBody text."
+        let cr = "### Star\rBody text."
+        let lfBlocks = InterpretationBlocks.parse(lf)
+        let crBlocks = InterpretationBlocks.parse(cr)
+        XCTAssertEqual(lfBlocks.map(\.id), crBlocks.map(\.id))
+        XCTAssertEqual(lfBlocks.map(\.title), crBlocks.map(\.title))
+        XCTAssertFalse(crBlocks[0].title.contains("\r"),
+                       "Title must not contain a carriage-return character")
+    }
+
+    // MARK: - C1: Contiguous numbering when an empty duplicate heading is skipped
+
+    /// An empty non-trailing duplicate heading (withheld due to no body)
+    /// must NOT consume a slug number. The next emitted duplicate gets -2,
+    /// not -3, so numbering stays contiguous.
+    func testEmptyDuplicateHeadingDoesNotConsumeSlotNumber() {
+        // Middle "### Card" has no body and is not the last heading, so it is
+        // flushed when the third heading is encountered — flushed with empty
+        // body → not emitted, must not advance counter.
+        let text = "### Card\nFirst body.\n### Card\n### Card\nThird body."
+        let blocks = InterpretationBlocks.parse(text)
+        // Only two blocks emitted: "card" and "card-2" (not "card-3").
+        XCTAssertEqual(blocks.count, 2, "Empty-body duplicate must be withheld, not emitted")
+        XCTAssertEqual(blocks[0].id, "card", "First emitted block keeps plain slug")
+        XCTAssertEqual(blocks[1].id, "card-2", "Second emitted block gets -2 (contiguous)")
+    }
+
+    // MARK: - C1 + streaming: id stability across incremental prefix sequence
+
+    /// Each emitted block's id must remain unchanged as more text arrives
+    /// (append-only / monotone requirement for SwiftUI ForEach identity).
+    /// Uses whole-token deltas to avoid the parser-internal transient where
+    /// a partial `#`/`##` prefix triggers the no-heading fallback momentarily.
+    func testStreamingPrefixSequenceKeepsEmittedBlockIdsStable() {
+        // Tokens represent realistic SSE deltas (whole tokens, not single chars).
+        let tokens = [
+            "### Card\nFir",
+            "st body.\n",
+            "### Card\nSec",
+            "ond body.\n",
+            "### Card\nThird body."
+        ]
+        var accumulated = ""
+        var previousIDs: [String] = []
+
+        for token in tokens {
+            accumulated += token
+            let blocks = InterpretationBlocks.parse(accumulated)
+            let currentIDs = blocks.map(\.id)
+            // Every id from the previous parse must still appear (no id may vanish).
+            for prevID in previousIDs {
+                XCTAssertTrue(currentIDs.contains(prevID),
+                              "Block id '\(prevID)' disappeared mid-stream after appending token \(token.debugDescription)")
+            }
+            // Block count must never decrease.
+            XCTAssertGreaterThanOrEqual(blocks.count, previousIDs.count,
+                                        "Block count regressed at token \(token.debugDescription)")
+            previousIDs = currentIDs
+        }
+        // Final parse must yield all three with contiguous ids.
+        let finalBlocks = InterpretationBlocks.parse(accumulated)
+        XCTAssertEqual(finalBlocks.map(\.id), ["card", "card-2", "card-3"])
+    }
+
     // MARK: - Intro + multiple headings full oracle simulation
 
     func testFullOracleTextParsesCorrectly() {

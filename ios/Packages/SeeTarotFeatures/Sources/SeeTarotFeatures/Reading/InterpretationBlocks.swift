@@ -55,7 +55,12 @@ public enum InterpretationBlocks {
     public static func parse(_ text: String) -> [InterpretationBlock] {
         guard !text.isEmpty else { return [] }
 
-        let lines = text.components(separatedBy: "\n")
+        // Mx1: Normalise CRLF and lone CR so heading detection, title capture,
+        // and slug() are unaffected by the line-ending style of the SSE source.
+        let normalised = text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let lines = normalised.components(separatedBy: "\n")
         var blocks: [InterpretationBlock] = []
         /// Tracks how many times each base slug has been used, for de-duplication.
         var slugOccurrences: [String: Int] = [:]
@@ -74,20 +79,22 @@ public enum InterpretationBlocks {
             // Withhold a trailing heading that has no body yet (partial-stream guard).
             if isLast && bodyText.isEmpty && !currentIsIntro { return }
 
-            let blockID: String
-            if currentIsIntro {
-                blockID = "-intro"
-            } else {
-                // De-duplicate: first occurrence keeps the plain slug;
-                // subsequent occurrences append -2, -3, … in document order.
-                let base = slug(from: currentTitle)
-                let count = (slugOccurrences[base] ?? 0) + 1
-                slugOccurrences[base] = count
-                blockID = count == 1 ? base : "\(base)-\(count)"
-            }
-
-            // Only emit if there is a non-empty body.
+            // C1: Only consume a slug-occurrence slot and emit when there is
+            // actual body text. Moving the counter inside this guard means an
+            // empty-body (withheld) duplicate heading never advances the counter,
+            // so ids are contiguous and stable as bodies arrive during streaming.
             if !bodyText.isEmpty {
+                let blockID: String
+                if currentIsIntro {
+                    blockID = "-intro"
+                } else {
+                    // De-duplicate: first occurrence keeps the plain slug;
+                    // subsequent occurrences append -2, -3, … in document order.
+                    let base = slug(from: currentTitle)
+                    let count = (slugOccurrences[base] ?? 0) + 1
+                    slugOccurrences[base] = count
+                    blockID = count == 1 ? base : "\(base)-\(count)"
+                }
                 blocks.append(InterpretationBlock(id: blockID,
                                                   title: currentTitle,
                                                   body: bodyText))
@@ -126,8 +133,8 @@ public enum InterpretationBlocks {
 
         // Edge: pure body text with no headings at all → single intro block.
         if blocks.isEmpty && !headingEncountered
-            && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            let bodyText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            && !normalised.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let bodyText = normalised.trimmingCharacters(in: .whitespacesAndNewlines)
             blocks.append(InterpretationBlock(id: "-intro", title: "", body: bodyText))
         }
 
