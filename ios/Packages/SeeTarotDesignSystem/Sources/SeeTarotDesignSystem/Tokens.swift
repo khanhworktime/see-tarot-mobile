@@ -71,21 +71,23 @@ public struct DesignTokens: Sendable {
     /// Each token scales with Dynamic Type via `Font.custom(_:size:relativeTo:)`,
     /// which uses the same UIFontMetrics scaling as system text styles.
     ///
-    /// H1-A: Resolution behaviour for each family:
-    ///   Cinzel — static-instance variable font whose named instances carry explicit
-    ///            PostScript-name records. Names are EXACT: "Cinzel-Regular",
-    ///            "CinzelRoman-Bold", "CinzelRoman-Black".
-    ///   Lora   — single-axis (wght 400–700) variable font. Its named instances carry
-    ///            NO PostScript-name records. CoreText auto-derives underscore-form names
-    ///            ("Lora-Regular_Medium" etc.) at runtime via fuzzy family matching.
-    ///            "Lora-Medium" therefore resolves correctly TODAY via CoreText fuzzy
-    ///            matching (verified: weight trait 0.2 = true Medium), but this relies
-    ///            on undocumented CoreText behaviour, not a guaranteed PostScript contract.
-    ///            FontWeightResolutionTests asserts the resolved weight traits so a future
-    ///            OS regression in name resolution fails CI.
+    /// H1-A: Resolution behaviour for each family (verified on iOS simulator):
+    ///   Cinzel — ships static named instances with EXACT PostScript-name records:
+    ///            "Cinzel-Regular", "CinzelRoman-Bold", "CinzelRoman-Black".
+    ///            `Font.custom` resolves these exactly on iOS — safe to name weights.
+    ///   Lora   — single-axis (wght 400–700) variable font whose ONLY PostScript
+    ///            name is "Lora-Regular" (no "Lora-Medium"/"Lora-Bold" records).
+    ///            iOS `UIFont(name:)`/`Font.custom` does NOT fuzzy-match by weight
+    ///            (only macOS CoreText does) — so `.custom("Lora-Medium")` on iOS
+    ///            silently falls back to the SYSTEM font, not Lora. Therefore every
+    ///            Lora token uses the one safe name "Lora-Regular"; caption is
+    ///            differentiated by size (13 vs body 17), not weight. A non-Regular
+    ///            Lora weight would require a `kCTFontVariationAttribute` wght
+    ///            descriptor (not used — caption Regular is the design decision).
     ///
-    /// System .serif (New York) is the fallback if the family is entirely absent;
-    /// for an unmatched weight within a present family the fallback is Lora-Regular.
+    /// System .serif (New York) is the fallback only if a family is entirely absent.
+    /// FontWeightResolutionTests runs on the iOS sim and fails CI if any token
+    /// resolves to a non-brand (system) family.
     public struct Typography: Sendable {
         /// Display — Cinzel Black, large ceremonial use.
         public let display: Font
@@ -95,7 +97,8 @@ public struct DesignTokens: Sendable {
         public let heading: Font
         /// Body — Lora Regular, primary reading text.
         public let body: Font
-        /// Caption — Lora Medium, supporting / meta text.
+        /// Caption — Lora Regular at 13pt, supporting / meta text. (Lora has no
+        /// iOS-resolvable Medium PS name; size differentiates it from body.)
         public let caption: Font
         /// Tabular figures for quota counts and timers (Lora-Regular + monospacedDigit).
         public let quotaFigures: Font
@@ -105,7 +108,7 @@ public struct DesignTokens: Sendable {
             title: .custom("CinzelRoman-Bold", size: 28, relativeTo: .title),
             heading: .custom("Cinzel-Regular", size: 20, relativeTo: .title2),
             body: .custom("Lora-Regular", size: 17, relativeTo: .body),
-            caption: .custom("Lora-Medium", size: 13, relativeTo: .footnote),
+            caption: .custom("Lora-Regular", size: 13, relativeTo: .footnote),
             quotaFigures: .custom("Lora-Regular", size: 17, relativeTo: .body).monospacedDigit()
         )
     }

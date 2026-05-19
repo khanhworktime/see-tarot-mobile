@@ -1,8 +1,16 @@
 // FontWeightResolutionTests.swift — H1-A regression guard
 // Asserts that the Lora and Cinzel tokens resolve to the expected weight traits
 // after FontRegistrar.registerAll(). Fails loudly if a future OS/CoreText change
-// stops fuzzy-resolving "Lora-Medium" (or exact Cinzel names) at the expected
-// weight. Guards the correctness documented in Tokens.swift H1-A comment.
+// breaks font registration or weight resolution.
+//
+// H1-A resolution behaviour (verified on iOS sim):
+//   Lora — single-axis variable font; ONLY PS name is "Lora-Regular". iOS
+//           UIFont(name:) does NOT fuzzy-match weights, so both the body and
+//           caption tokens use "Lora-Regular" (caption differs by size, not
+//           weight). These tests assert the PRODUCTION token names resolve to a
+//           real Lora-family font (not a silent system-font fallback).
+//   Cinzel — named-instance PS records: "Cinzel-Regular", "CinzelRoman-Bold",
+//            "CinzelRoman-Black". UIFont(name:) resolves exactly.
 //
 // Requires a UIKit host (iOS simulator or device). On a pure macOS test host
 // UIFont is unavailable, so the tests are skipped via XCTSkip.
@@ -35,22 +43,21 @@ final class FontWeightResolutionTests: XCTestCase {
             "Lora-Regular weight trait \(weightTrait) is not near 0.0 (Regular)")
     }
 
-    /// Lora caption token uses "Lora-Medium" — resolved via CoreText fuzzy matching
-    /// on macOS/iOS to the Medium instance (wght≈500). Expected trait: ≈ 0.2.
-    /// This test is the CI guard described in H1-A: if CoreText stops fuzzy-resolving
-    /// "Lora-Medium" to the true Medium weight, this test will fail and alert the team.
-    func testLoraCaptionTokenResolvesAtMediumWeight() throws {
-        let font = UIFont(name: "Lora-Medium", size: 13)
-        let resolved = try XCTUnwrap(font,
-            "Lora-Medium must resolve via CoreText fuzzy matching")
-        let weightTrait = weightValue(of: resolved)
-        // UIFont weight trait for Medium is approximately 0.2 on current CoreText.
-        // Tolerance of 0.15 accommodates minor platform variation while catching
-        // a regression to Regular (trait ≈ 0.0) or Bold (trait ≈ 0.4+).
-        XCTAssertGreaterThan(weightTrait, 0.05,
-            "Lora-Medium resolved at weight \(weightTrait) — expected > 0.05 (Medium); CoreText fuzzy resolution may have regressed")
-        XCTAssertLessThan(weightTrait, 0.35,
-            "Lora-Medium resolved at weight \(weightTrait) — expected < 0.35 (not Bold); unexpected weight resolution")
+    /// Caption token uses "Lora-Regular" at 13pt (Lora has no iOS-resolvable
+    /// Medium PS name; size differentiates caption from body). This guards the
+    /// PRODUCTION token: it must resolve to a real Lora-family font, NOT a silent
+    /// system-font fallback (the H1-A bug this regression test exists to catch).
+    func testLoraCaptionTokenResolvesToLoraRegular() throws {
+        let font = try XCTUnwrap(
+            UIFont(name: "Lora-Regular", size: 13),
+            "Lora-Regular must resolve — FontRegistrar.registerAll() may have failed")
+        let familyName = font.familyName.lowercased()
+        XCTAssertTrue(familyName.contains("lora"),
+            "Caption font resolved to family '\(font.familyName)' — expected Lora "
+            + "(a system-font fallback here is the H1-A production bug)")
+        let weightTrait = weightValue(of: font)
+        XCTAssertEqual(weightTrait, 0.0, accuracy: 0.15,
+            "Lora-Regular weight trait \(weightTrait) is not near 0.0 (Regular)")
     }
 
     // MARK: - Cinzel exact PostScript-name assertions
