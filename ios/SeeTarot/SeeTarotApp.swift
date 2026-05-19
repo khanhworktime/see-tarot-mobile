@@ -1,8 +1,13 @@
 import SwiftUI
+import SeeTarotDesignSystem
 import SeeTarotFeatures
 
 @main
 struct SeeTarotApp: App {
+    init() {
+        FontRegistrar.registerAll()
+    }
+
     @State private var auth = SeeTarotApp.makeAuth()
 
     var body: some Scene {

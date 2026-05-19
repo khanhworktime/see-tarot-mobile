@@ -9,6 +9,7 @@ let package = Package(
     targets: [
         .target(
             name: "SeeTarotDesignSystem",
+            resources: [.process("Resources")],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         .testTarget(
