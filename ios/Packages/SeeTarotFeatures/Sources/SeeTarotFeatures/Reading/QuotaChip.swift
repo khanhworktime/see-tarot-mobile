@@ -18,6 +18,8 @@ public struct QuotaDisplay: Equatable, Sendable {
     }
 }
 
+/// Phase 08: Cosmic Mysticism re-skin — glass capsule chips, tabular figures
+/// token on numeric counts to prevent digit jitter. Logic untouched.
 public struct QuotaChip: View {
     @Environment(\.designTokens) private var tokens
     let quota: Quota
@@ -27,14 +29,25 @@ public struct QuotaChip: View {
     public var body: some View {
         let display = QuotaDisplay(quota)
         HStack(spacing: tokens.spacing.sm) {
-            ForEach([display.tierText, display.dailyText,
-                     display.oracleText], id: \.self) { text in
-                Text(text)
-                    .font(tokens.typography.caption)
-                    .padding(.horizontal, tokens.spacing.sm)
-                    .padding(.vertical, tokens.spacing.xs)
-                    .background(tokens.palette.surface, in: Capsule())
-            }
+            chip(display.tierText, isNumeric: false)
+            chip(display.dailyText, isNumeric: true)
+            chip(display.oracleText, isNumeric: true)
         }
+    }
+
+    private func chip(_ text: String, isNumeric: Bool) -> some View {
+        Text(text)
+            .font(isNumeric ? tokens.typography.quotaFigures : tokens.typography.caption)
+            .foregroundStyle(tokens.palette.accentBright)
+            .padding(.horizontal, tokens.spacing.sm)
+            .padding(.vertical, tokens.spacing.xs)
+            .background(
+                Capsule()
+                    .fill(tokens.palette.bgLayer2.opacity(0.7))
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(tokens.palette.accentSilver.opacity(0.4))
+            )
     }
 }
