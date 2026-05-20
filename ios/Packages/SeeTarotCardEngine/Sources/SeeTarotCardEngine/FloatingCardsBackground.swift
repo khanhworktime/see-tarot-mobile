@@ -11,6 +11,7 @@
 //   - Reduced-motion path: static, no breathing or drift.
 
 import SwiftUI
+import SeeTarotDesignSystem
 
 // MARK: - Card layout descriptor (internal)
 
@@ -42,15 +43,15 @@ private let defaultSlots: [CardSlot] = [
     CardSlot(kind: .back, anchorX: 0.85, anchorY: 0.20,
              scale: 1.15, rotX: 12, rotY: -18, rotZ: -8,
              phaseOffset: 0.0, driftPeriod: 18, spinPeriod: 22,
-             opacity: 0.88),   // top-corner peek — high pop
-    CardSlot(kind: .theStar, anchorX: 0.80, anchorY: 0.45,
+             opacity: 0.88),               // top-corner peek — high pop
+    CardSlot(kind: .face(BundledCard.theStar), anchorX: 0.80, anchorY: 0.45,
              scale: 1.0, rotX: -8, rotY: 20, rotZ: 6,
              phaseOffset: 0.37, driftPeriod: 15, spinPeriod: 19,
-             opacity: 0.78),   // mid-right beside form
-    CardSlot(kind: .theMoon, anchorX: 0.42, anchorY: 0.80,
+             opacity: 0.78),               // mid-right beside form
+    CardSlot(kind: .face(BundledCard.theMoon), anchorX: 0.42, anchorY: 0.80,
              scale: 1.3, rotX: 10, rotY: -10, rotZ: 4,
              phaseOffset: 0.65, driftPeriod: 20, spinPeriod: 14,
-             opacity: 0.55)    // lower-centre, partially behind form — keep subdued
+             opacity: 0.55)                // lower-centre, partially behind form
 ]
 
 // MARK: - FloatingCardsBackground
@@ -64,7 +65,7 @@ public struct FloatingCardsBackground: View {
 
     /// - Parameter kinds: Card kinds in display order (back → front).
     ///   Must have exactly 3 elements; extras are ignored, missing use defaults.
-    public init(kinds: [CeremonialFaceKind] = [.back, .theStar, .theMoon]) {
+    public init(kinds: [CeremonialFaceKind] = [.back, .face(BundledCard.theStar), .face(BundledCard.theMoon)]) {
         self.kinds = kinds
     }
 

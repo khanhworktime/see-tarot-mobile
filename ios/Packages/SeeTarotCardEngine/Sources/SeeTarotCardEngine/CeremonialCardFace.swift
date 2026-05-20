@@ -1,15 +1,11 @@
-// CeremonialCardFace.swift — CardEngine / Phase 09-Pass2 (Visual Tuning)
+// CeremonialCardFace.swift — CardEngine / Phase 10 (Real Card Art)
 //
-// Renders a stylised tarot card face at the forced 95/155 ratio using only
-// SwiftUI vector drawing — no image assets required.
-// Used pre-auth (Login screen) where BE artwork is unavailable.
+// Renders a tarot card face at the forced 95/155 ratio using bundled card art.
+//   .back        → brand-logo.png centered on cosmic gradient + aurora glow
+//   .face(card)  → real SVG art stretched to fill, arcana label below
 //
-// Pass 2: aurora-tinted radial bg per face, glyph at 46pt with glow shadow,
-// accentBright arcana label, aurora-tinted hairline border.
-//
-// ICON NOTE: SF Symbols used (not PhosphorSwift) — Phosphor's Package.swift omits
-// `resources:`, causing Bundle.module failure on macOS 13 SPM host. Phosphor icons
-// are available via phosphorIcon() in SeeTarotDesignSystem for iOS-only targets.
+// The 95×155 frame is a hard product constraint; aspect ratio is ~0.613 which
+// closely matches the SVG portraits — mild distortion is accepted by design.
 //
 // Token access: via `\.designTokens` environment injection (no singletons).
 
@@ -19,18 +15,16 @@ import SeeTarotDesignSystem
 // MARK: - Kind
 
 /// Which ceremonial face variant to render.
-public enum CeremonialFaceKind: Sendable {
-    /// Brand back-of-card: cosmic radial gradient + moon-stars glyph + corner sparkles.
+public enum CeremonialFaceKind: Sendable, Hashable {
+    /// Brand back-of-card: cosmic gradient + brand-logo PNG centered.
     case back
-    /// The Star (XVII): gradient + star glyph + arcana label.
-    case theStar
-    /// The Moon (XVIII): gradient + moon-stars glyph + arcana label.
-    case theMoon
+    /// A bundled SVG card face overlaid on the aurora gradient background.
+    case face(BundledCard)
 }
 
 // MARK: - CeremonialCardFace
 
-/// A purely vector tarot card face at the forced 95 × 155 pt ratio (#010726 fill rule).
+/// A tarot card face at the forced 95 × 155 pt ratio.
 /// Suitable for the Login screen before any auth / image assets are available.
 public struct CeremonialCardFace: View {
     @Environment(\.designTokens) private var tokens
@@ -41,16 +35,16 @@ public struct CeremonialCardFace: View {
         self.kind = kind
     }
 
-    // Forced card dimensions per product hard constraint (95/155).
     private let cardW: CGFloat = 95
     private let cardH: CGFloat = 155
 
     public var body: some View {
         ZStack {
             cardBackground
-            glyphLayer
-            if kind != .back { arcanaLabel }
-            if kind == .back { cornerSparkles }
+            artworkLayer
+            if case .face(let card) = kind {
+                arcanaLabel(card: card)
+            }
             hairlineBorder
         }
         .frame(width: cardW, height: cardH)
@@ -59,8 +53,7 @@ public struct CeremonialCardFace: View {
 
     // MARK: - Background
 
-    /// Radial gradient: aurora-tinted bright inner → bgLayer2 mid → bg outer.
-    /// Each face kind uses a distinct aurora hue for its inner glow.
+    /// Radial gradient: aurora-tinted inner → bgLayer2 → bg outer.
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: 10, style: .continuous)
             .fill(
@@ -77,70 +70,52 @@ public struct CeremonialCardFace: View {
             )
     }
 
-    /// Aurora inner-glow color per card kind.
     private var innerGlowColor: Color {
         switch kind {
-        case .back:    return tokens.palette.auroraViolet
-        case .theStar: return tokens.palette.auroraCyan
-        case .theMoon: return tokens.palette.auroraViolet
+        case .back:              return tokens.palette.auroraViolet
+        case .face(let card):   return auroraColor(for: card)
         }
     }
 
-    // MARK: - Glyph
-
-    /// Central glyph at ~50% card width (≈46 pt font), aurora-tinted with outer glow.
-    private var glyphLayer: some View {
-        Image(systemName: glyphSystemName)
-            .font(.system(size: 46))
-            .foregroundStyle(glyphGradient)
-            .shadow(color: glyphGlowColor.opacity(0.70), radius: 12, x: 0, y: 0)
-            .opacity(0.95)
-    }
-
-    private var glyphSystemName: String {
-        switch kind {
-        case .back:    return "moon.stars.fill"
-        case .theStar: return "star.fill"
-        case .theMoon: return "moon.fill"
+    private func auroraColor(for card: BundledCard) -> Color {
+        switch card {
+        case .theStar:     return tokens.palette.auroraCyan
+        case .theMoon:     return tokens.palette.auroraViolet
+        case .theSun:      return tokens.palette.auroraPink
+        case .theFool:     return tokens.palette.auroraCyan
+        case .theMagician: return tokens.palette.auroraViolet
         }
     }
 
-    /// Silver → aurora gradient per face kind.
-    private var glyphGradient: LinearGradient {
+    // MARK: - Artwork
+
+    @ViewBuilder
+    private var artworkLayer: some View {
         switch kind {
         case .back:
-            return LinearGradient(
-                colors: [tokens.palette.accentSilver, tokens.palette.auroraViolet],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-        case .theStar:
-            return LinearGradient(
-                colors: [tokens.palette.accentBright, tokens.palette.auroraCyan],
-                startPoint: .top, endPoint: .bottom
-            )
-        case .theMoon:
-            return LinearGradient(
-                colors: [tokens.palette.accentSilver, tokens.palette.auroraViolet],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-        }
-    }
+            // Brand logo: PNG centered at ~70% card width with aurora glow.
+            CardArt.brandLogoBack
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: cardW * 0.70, height: cardH * 0.70)
+                .shadow(color: tokens.palette.auroraViolet.opacity(0.65), radius: 10, x: 0, y: 0)
 
-    private var glyphGlowColor: Color {
-        switch kind {
-        case .back:    return tokens.palette.auroraViolet
-        case .theStar: return tokens.palette.auroraCyan
-        case .theMoon: return tokens.palette.auroraViolet
+        case .face(let card):
+            // Real SVG art stretched to fill the forced 95/155 frame.
+            CardArt.image(for: card)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: cardW, height: cardH)
         }
     }
 
     // MARK: - Arcana label
 
-    /// Cinzel small-caps label at bottom — accentBright, slightly larger (8pt).
-    private var arcanaLabel: some View {
+    /// Cinzel small-caps label at bottom — accentBright.
+    private func arcanaLabel(card: BundledCard) -> some View {
         VStack {
             Spacer()
-            Text(arcanaLabelText)
+            Text("\(card.arcanaNumeral) · \(card.displayName.uppercased())")
                 .font(.custom("Cinzel-Regular", size: 8, relativeTo: .caption2))
                 .foregroundStyle(tokens.palette.accentBright)
                 .tracking(1.4)
@@ -148,45 +123,15 @@ public struct CeremonialCardFace: View {
         }
     }
 
-    private var arcanaLabelText: String {
-        switch kind {
-        case .theStar: return "XVII · THE STAR"
-        case .theMoon: return "XVIII · THE MOON"
-        case .back:    return ""
-        }
-    }
-
-    // MARK: - Corner sparkles (back card)
-
-    /// Four corner sparkles — accentSilver with slight aurora glow.
-    private var cornerSparkles: some View {
-        GeometryReader { geo in
-            let inset: CGFloat = 8
-            Group {
-                sparkle.position(x: inset, y: inset)
-                sparkle.position(x: geo.size.width - inset, y: inset)
-                sparkle.position(x: inset, y: geo.size.height - inset)
-                sparkle.position(x: geo.size.width - inset, y: geo.size.height - inset)
-            }
-        }
-    }
-
-    private var sparkle: some View {
-        Image(systemName: "sparkle")
-            .font(.system(size: 9))
-            .foregroundStyle(tokens.palette.accentSilver.opacity(0.70))
-            .shadow(color: tokens.palette.auroraViolet.opacity(0.50), radius: 4, x: 0, y: 0)
-    }
-
     // MARK: - Hairline border
 
-    /// 1 pt aurora-tinted hairline (not just plain silver).
+    /// 1 pt aurora-tinted hairline border.
     private var hairlineBorder: some View {
         RoundedRectangle(cornerRadius: 10, style: .continuous)
             .strokeBorder(
                 LinearGradient(
                     colors: [
-                        glyphGlowColor.opacity(0.55),
+                        innerGlowColor.opacity(0.55),
                         tokens.palette.accentSilver.opacity(0.30)
                     ],
                     startPoint: .topLeading,
