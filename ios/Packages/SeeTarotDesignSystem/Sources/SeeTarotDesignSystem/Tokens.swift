@@ -36,6 +36,23 @@ public struct DesignTokens: Sendable {
         public let accentDim: Color
         /// Particles, sparkle, constellation. #FFFFFF — apply alpha at use site.
         public let starlight: Color
+        /// Aurora violet — primary vibrant accent. #8B5CF6
+        public let auroraViolet: Color
+        /// Aurora cyan — secondary vibrant accent. #22D3EE
+        public let auroraCyan: Color
+        /// Aurora pink — reserved for hero accents. #EC4899
+        public let auroraPink: Color
+
+        /// Convenience gradient: auroraViolet → auroraCyan, top-leading → bottom-trailing.
+        /// WCAG note: white text over the violet half (~4.79:1); gradient is centred on violet
+        /// for CTAs — pair with a dark glow scrim under text if needed at cyan edge.
+        public var auroraGradient: LinearGradient {
+            LinearGradient(
+                colors: [auroraViolet, auroraCyan],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
 
         /// Cosmic Mysticism palette.
         public static let cosmic = Palette(
@@ -52,7 +69,11 @@ public struct DesignTokens: Sendable {
             accentSilver: hex(0xC9D2E3),
             accentBright: hex(0xE8EDF7),
             accentDim: hex(0x8A93A8),
-            starlight: .white
+            starlight: .white,
+            // Aurora vibrant accents
+            auroraViolet: hex(0x8B5CF6),
+            auroraCyan: hex(0x22D3EE),
+            auroraPink: hex(0xEC4899)
         )
 
         // MARK: Hex helper
