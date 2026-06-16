@@ -2,9 +2,8 @@ import SwiftUI
 import SeeTarotCore
 import SeeTarotDesignSystem
 
-/// Profile editor (E04). Personalization is BE-side — this only manages the
-/// profile fields the BE consumes. Save sends only changed fields; the
-/// session refreshes via `ProfileStore` → `AuthStore.refreshSession()`.
+/// Profile editor (E04). Phase 08: Cosmic Mysticism re-skin — glass sections,
+/// palette typography, styled save/sign-out. Store/validation/navigation untouched.
 struct ProfileView: View {
     @Environment(\.designTokens) private var tokens
     @State private var store: ProfileStore
@@ -20,8 +19,7 @@ struct ProfileView: View {
     }()
 
     /// Always include the current value so a nil / abbreviated /
-    /// non-canonical session timezone still has a selectable tag (else the
-    /// Picker has no match → unintended dirty / un-saveable form).
+    /// non-canonical session timezone still has a selectable tag.
     private var timezoneOptions: [String] {
         let known = TimeZone.knownTimeZoneIdentifiers
         let current = store.timezone
@@ -36,72 +34,187 @@ struct ProfileView: View {
     }
 
     var body: some View {
-        Form {
-            Section("Display name") {
-                TextField("Name", text: $store.name)
-                error(.name)
-            }
-            Section("Birth date") {
-                if store.birthDate.isEmpty {
-                    // No birthDate yet — don't silently show "today" in a
-                    // picker (a stray tap would write today). Require an
-                    // explicit action that seeds a neutral default.
-                    Button("Set birth date") {
-                        store.birthDate = Self.isoDay.string(from: Date())
-                    }
-                } else {
-                    DatePicker("Birth date", selection: birthDate,
-                               displayedComponents: .date)
-                        .datePickerStyle(.compact)
+        ZStack {
+            tokens.palette.bg.ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: tokens.spacing.md) {
+                    displayNameSection
+                    birthDateSection
+                    timezoneSection
+                    readingFocusSection
+                    saveSection
                 }
-                error(.birthDate)
-            }
-            Section("Timezone") {
-                Picker("Timezone", selection: $store.timezone) {
-                    ForEach(timezoneOptions, id: \.self) {
-                        Text($0).tag($0)
-                    }
-                }
-                error(.timezone)
-            }
-            Section("Reading focus") {
-                Picker("Preferred", selection: $store.preferredIntent) {
-                    ForEach(IntentCopy.all, id: \.intent) { c in
-                        Text(c.label).tag(c.intent.rawValue)
-                    }
-                }
-                error(.preferredIntent)
-            }
-            Section {
-                if case .failed(let msg) = store.phase {
-                    Text(msg).foregroundStyle(.red)
-                        .font(tokens.typography.caption)
-                }
-                if case .saved = store.phase {
-                    Text("Saved.").foregroundStyle(.green)
-                        .font(tokens.typography.caption)
-                }
-                Button {
-                    Task { await store.save() }
-                } label: {
-                    if case .saving = store.phase {
-                        ProgressView()
-                    } else {
-                        Text("Save changes")
-                    }
-                }
-                .disabled(!store.canSave)
+                .padding(tokens.spacing.md)
             }
         }
         .navigationTitle("Profile")
+#if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+#endif
+    }
+
+    // MARK: - Sections
+
+    private var displayNameSection: some View {
+        cosmicSection(title: "Display Name") {
+            cosmicTextField("Name", text: $store.name)
+            #if os(iOS)
+                .textContentType(.name)
+            #endif
+            fieldError(.name)
+        }
+    }
+
+    private var birthDateSection: some View {
+        cosmicSection(title: "Birth Date") {
+            if store.birthDate.isEmpty {
+                Button("Set Birth Date") {
+                    store.birthDate = Self.isoDay.string(from: Date())
+                }
+                .font(tokens.typography.body)
+                .foregroundStyle(tokens.palette.accentSilver)
+                .frame(minHeight: 44, alignment: .leading)
+            } else {
+                DatePicker("Birth date", selection: birthDate,
+                           displayedComponents: .date)
+                    .datePickerStyle(.compact)
+                    .colorScheme(.dark)
+                    .frame(minHeight: 44)
+            }
+            fieldError(.birthDate)
+        }
+    }
+
+    private var timezoneSection: some View {
+        cosmicSection(title: "Timezone") {
+            Picker("Timezone", selection: $store.timezone) {
+                ForEach(timezoneOptions, id: \.self) {
+                    Text($0).tag($0)
+                        .foregroundStyle(tokens.palette.accentBright)
+                }
+            }
+#if os(iOS)
+            .pickerStyle(.navigationLink)
+#endif
+            .font(tokens.typography.body)
+            .foregroundStyle(tokens.palette.accentBright)
+            .frame(minHeight: 44)
+            fieldError(.timezone)
+        }
+    }
+
+    private var readingFocusSection: some View {
+        cosmicSection(title: "Reading Focus") {
+            Picker("Preferred", selection: $store.preferredIntent) {
+                ForEach(IntentCopy.all, id: \.intent) { copy in
+                    Text(copy.label).tag(copy.intent.rawValue)
+                        .foregroundStyle(tokens.palette.accentBright)
+                }
+            }
+#if os(iOS)
+            .pickerStyle(.navigationLink)
+#endif
+            .font(tokens.typography.body)
+            .foregroundStyle(tokens.palette.accentBright)
+            .frame(minHeight: 44)
+            fieldError(.preferredIntent)
+        }
+    }
+
+    private var saveSection: some View {
+        GlassSurface {
+            VStack(spacing: tokens.spacing.sm) {
+                phaseMessage
+                Button {
+                    Task { await store.save() }
+                } label: {
+                    Group {
+                        if case .saving = store.phase {
+                            ProgressView()
+                                .tint(tokens.palette.accentBright)
+                        } else {
+                            Text("Save Changes")
+                                .font(tokens.typography.body.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 44)
+                    .padding(.vertical, tokens.spacing.xs)
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(tokens.palette.accentSilver.opacity(store.canSave ? 0.2 : 0.08))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(tokens.palette.accentSilver.opacity(0.45))
+                )
+                .foregroundStyle(tokens.palette.accentBright)
+                .disabled(!store.canSave)
+            }
+        }
+        .glassCard()
+    }
+
+    // MARK: - Helpers
+
+    @ViewBuilder
+    private var phaseMessage: some View {
+        if case .failed(let msg) = store.phase {
+            Label(msg, systemImage: "exclamationmark.circle")
+                .font(tokens.typography.caption)
+                .foregroundStyle(tokens.palette.accentBright)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else if case .saved = store.phase {
+            Label("Changes saved.", systemImage: "checkmark.circle")
+                .font(tokens.typography.caption)
+                .foregroundStyle(tokens.palette.accentSilver)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     @ViewBuilder
-    private func error(_ field: ProfileField) -> some View {
-        if let msg = store.validationErrors[field]
-            ?? store.fieldErrors[field] {
-            Text(msg).foregroundStyle(.red)
+    private func fieldError(_ field: ProfileField) -> some View {
+        if let msg = store.validationErrors[field] ?? store.fieldErrors[field] {
+            Text(msg)
                 .font(tokens.typography.caption)
+                .foregroundStyle(tokens.palette.accentBright)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    @ViewBuilder
+    private func cosmicSection(title: String,
+                                @ViewBuilder content: () -> some View) -> some View {
+        GlassSurface {
+            VStack(alignment: .leading, spacing: tokens.spacing.sm) {
+                Text(title)
+                    .font(tokens.typography.caption)
+                    .foregroundStyle(tokens.palette.accentDim)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                content()
+            }
+        }
+        .glassCard()
+    }
+
+    @ViewBuilder
+    private func cosmicTextField(_ placeholder: String,
+                                 text: Binding<String>) -> some View {
+        TextField(placeholder, text: text)
+            .font(tokens.typography.body)
+            .foregroundStyle(tokens.palette.accentBright)
+            .padding(tokens.spacing.sm)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(tokens.palette.bgLayer2.opacity(0.6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(tokens.palette.accentSilver.opacity(0.35))
+            )
+            .frame(minHeight: 44)
     }
 }

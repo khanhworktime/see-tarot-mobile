@@ -27,6 +27,11 @@
         <key>NSAllowsLocalNetworking</key>
         <true/>
     </dict>
+    <key>UIAppFonts</key>
+    <array>
+        <string>Cinzel.ttf</string>
+        <string>Lora.ttf</string>
+    </array>
     <key>UILaunchScreen</key>
     <dict/>
 </dict>

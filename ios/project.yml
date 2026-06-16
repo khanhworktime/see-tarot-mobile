@@ -20,6 +20,42 @@ packages:
     path: Packages/SeeTarotDesignSystem
   SeeTarotCardEngine:
     path: Packages/SeeTarotCardEngine
+schemes:
+  SeeTarot:
+    build:
+      targets:
+        SeeTarot: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+  SeeTarotDesignSystemTests:
+    build:
+      targets:
+        SeeTarot: test
+    test:
+      targets:
+        - package: SeeTarotDesignSystem/SeeTarotDesignSystemTests
+  SeeTarotCardEngineTests:
+    build:
+      targets:
+        SeeTarot: test
+    test:
+      targets:
+        - package: SeeTarotCardEngine/SeeTarotCardEngineTests
+  SeeTarotFeaturesTests:
+    build:
+      targets:
+        SeeTarot: test
+    test:
+      targets:
+        - package: SeeTarotFeatures/SeeTarotFeaturesTests
 targets:
   SeeTarot:
     type: application

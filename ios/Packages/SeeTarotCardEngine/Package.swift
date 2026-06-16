@@ -6,7 +6,9 @@ let package = Package(
     name: "SeeTarotCardEngine",
     platforms: [.iOS(.v17), .macOS(.v13)],
     products: [.library(name: "SeeTarotCardEngine", targets: ["SeeTarotCardEngine"])],
-    dependencies: [.package(path: "../SeeTarotDesignSystem")],
+    dependencies: [
+        .package(path: "../SeeTarotDesignSystem")
+    ],
     targets: [
         .target(
             name: "SeeTarotCardEngine",

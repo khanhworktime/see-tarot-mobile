@@ -1,3 +1,10 @@
+// Components.swift — shared SwiftUI primitives.
+// Phase 02 note: GlassSurface, ScrimText, glassText modifier, and
+// ContrastRatio are defined in their own files (GlassSurface.swift /
+// ContrastRatio.swift) and are automatically exported as part of the
+// SeeTarotDesignSystem module — no re-export needed in Swift.
+// This file retains PrimaryButton and LoadingView.
+
 import SwiftUI
 
 /// Brand primary button. Reused across features so styling stays DRY.
