@@ -1,5 +1,7 @@
-// Debug build configuration. Local BE dev default. No secrets here.
+// Debug build configuration. No secrets here.
 // The $() splits the // so xcconfig does not treat it as a comment.
-// LAN IP so a physical iPhone on the same Wi-Fi reaches the Mac-hosted BE
-// (localhost only works on the simulator). Update if the Mac IP changes.
-API_BASE_URL = http:/$()/192.168.1.100:3001
+// Currently pointed at the PROD API for on-device testing against real BE.
+// To switch back to a LAN-hosted local BE for offline dev, swap to e.g.
+//   API_BASE_URL = http:/$()/192.168.1.100:3001
+// (LAN IP because localhost only resolves on the simulator, not on a phone).
+API_BASE_URL = https:/$()/api.seetarot.com

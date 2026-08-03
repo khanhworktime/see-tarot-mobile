@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "tarot-contract": {
+      "command": "/Users/kristdev/.bun/bin/bun",
+      "args": [
+        "/Users/kristdev/Desktop/Work/Personal/see-tarot-be/contract-mcp/server.ts"
+      ]
+    },
+    "XcodeBuildMCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "xcodebuildmcp@latest",
+        "mcp"
+      ]
+    },
+    "ios-simulator": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ios-simulator-mcp"
+      ]
+    }
+  }
+}
